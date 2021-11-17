@@ -1,0 +1,163 @@
+<?xml version="1.0"?>
+<ruleset name="SingleID CodeSniffer Standard">
+
+    <config name="installed_paths" value="../../slevomat/coding-standard"/>
+
+    <rule ref="Generic.Strings.UnnecessaryStringConcat">
+        <properties>
+            <property name="allowMultiline" value="true" />
+        </properties>
+    </rule>
+
+    <rule ref="PSR12.ControlStructures.BooleanOperatorPlacement">
+        <properties>
+            <property name="allowOnly" value="first" />
+        </properties>
+    </rule>
+
+    <!-- >>> Functional -->
+    <rule ref="SlevomatCodingStandard.Classes.ClassStructure">
+        <properties>
+            <property name="groups" type="array">
+                <element value="uses" />
+                <element value="public constants" />
+                <element value="protected constants" />
+                <element value="private constants" />
+                <element value="public static properties" />
+                <element value="protected static properties" />
+                <element value="private static properties" />
+                <element value="public properties" />
+                <element value="protected properties" />
+                <element value="private properties" />
+                <element value="static constructors" />
+                <element value="constructor" />
+                <element value="destructor" />
+                <element value="magic methods" />
+                <element value="public static abstract methods" />
+                <element value="public abstract methods" />
+                <element value="public static methods" />
+                <element value="public methods" />
+                <element value="protected static abstract methods" />
+                <element value="protected abstract methods" />
+                <element value="protected static methods" />
+                <element value="protected methods" />
+                <element value="private static methods" />
+                <element value="private methods" />
+            </property>
+        </properties>
+    </rule>
+    <rule ref="SlevomatCodingStandard.Classes.RequireConstructorPropertyPromotion" />
+    <rule ref="SlevomatCodingStandard.Classes.UselessLateStaticBinding" />
+    <rule ref="SlevomatCodingStandard.ControlStructures.AssignmentInCondition" />
+    <rule ref="SlevomatCodingStandard.ControlStructures.DisallowContinueWithoutIntegerOperandInSwitch" />
+    <rule ref="SlevomatCodingStandard.ControlStructures.EarlyExit">
+        <properties>
+            <property name="ignoreStandaloneIfInScope" value="true" />
+            <property name="ignoreOneLineTrailingIf" value="true" />
+            <property name="ignoreTrailingIfWithOneInstruction" value="true" />
+        </properties>
+    </rule>
+    <rule ref="SlevomatCodingStandard.ControlStructures.RequireNullCoalesceEqualOperator" />
+    <rule ref="SlevomatCodingStandard.Exceptions.ReferenceThrowableOnly" />
+    <rule ref="SlevomatCodingStandard.Exceptions.RequireNonCapturingCatch" />
+    <rule ref="SlevomatCodingStandard.Functions.StaticClosure" />
+    <rule ref="SlevomatCodingStandard.Functions.StrictCall" />
+    <rule ref="SlevomatCodingStandard.Functions.ArrowFunctionDeclaration">
+        <properties>
+            <property name="allowMultiLine" value="true" />
+        </properties>
+    </rule>
+    <rule ref="SlevomatCodingStandard.Operators.DisallowEqualOperators" />
+    <rule ref="SlevomatCodingStandard.PHP.DisallowDirectMagicInvokeCall" />
+    <rule ref="SlevomatCodingStandard.TypeHints.ReturnTypeHint">
+        <exclude name="SlevomatCodingStandard.TypeHints.ReturnTypeHint.MissingTraversableTypeHintSpecification" />
+    </rule>
+    <rule ref="SlevomatCodingStandard.TypeHints.UnionTypeHintFormat">
+        <properties>
+            <property name="withSpaces" value="no" />
+            <property name="shortNullable" value="yes" />
+            <property name="nullPosition" value="last" />
+        </properties>
+    </rule>
+    <rule ref="SlevomatCodingStandard.TypeHints.UselessConstantTypeHint" />
+    <!-- <<< Functional -->
+
+    <!-- >>> Cleaning -->
+    <rule ref="SlevomatCodingStandard.Exceptions.DeadCatch" />
+    <rule ref="SlevomatCodingStandard.Namespaces.UnusedUses">
+        <properties>
+            <property name="searchAnnotations" value="true" />
+        </properties>
+    </rule>
+    <rule ref="SlevomatCodingStandard.Namespaces.UseFromSameNamespace" />
+    <rule ref="SlevomatCodingStandard.Namespaces.UselessAlias" />
+    <rule ref="SlevomatCodingStandard.Variables.DisallowSuperGlobalVariable" />
+    <!-- <<< Cleaning -->
+
+    <!-- >>> Formatting -->
+    <rule ref="SlevomatCodingStandard.Arrays.TrailingArrayComma" />
+    <rule ref="SlevomatCodingStandard.Classes.ClassConstantVisibility" />
+    <rule ref="SlevomatCodingStandard.Classes.ClassMemberSpacing" />
+    <rule ref="SlevomatCodingStandard.Classes.MethodSpacing" />
+    <rule ref="SlevomatCodingStandard.Classes.ModernClassNameReference" />
+    <rule ref="SlevomatCodingStandard.Commenting.DocCommentSpacing">
+        <properties>
+            <property name="annotationsGroups" type="array">
+                <element value="@deprecated" />
+                <element value="@template, @template-covariant, @psalm-immutable" />
+                <element value="@method" />
+                <element value="@covers, @coversNothing, @coversDefaultClass" />
+                <element value="@internal, @final, @psalm-internal" />
+                <element value="@extends, @implements" />
+                <element value="@psalm-type, @psalm-import-type" />
+                <element value="@var, @psalm-var, @psalm-property, @psalm-property-read, @psalm-property-write, @readonly, @psalm-readonly-allow-private-mutation, @psalm-allow-private-mutation, @phan-read-only, @phan-write-only" />
+                <element value="@dataProvider" />
+                <element value="@param, @psalm-param, @param-out, @phan-param" />
+                <element value="@throws" />
+                <element value="@return, @psalm-return, @phan-return" />
+                <element value="@psalm-external-mutation-free, @psalm-pure, @phan-side-effect-free" />
+                <element value="@pure-callable" />
+                <element value="@psalm-assert, @phan-assert" />
+                <element value="@property, @psalm-property" />
+                <element value="@see" />
+                <element value="@suppress, @psalm-suppress, @phpstan-ignore-next-line, @phan-suppress-next-line, @phan-suppress-current-line" />
+            </property>
+        </properties>
+    </rule>
+    <rule ref="SlevomatCodingStandard.Commenting.ForbiddenComments">
+        <properties>
+            <property name="forbiddenCommentPatterns" type="array">
+                <element value="(^.*\sconstructor\.)" />
+                <element value="((Developer|Created):.*$)" />
+            </property>
+        </properties>
+    </rule>
+    <rule ref="SlevomatCodingStandard.Commenting.InlineDocCommentDeclaration" />
+    <rule ref="SlevomatCodingStandard.Commenting.UselessInheritDocComment" />
+    <rule ref="SlevomatCodingStandard.ControlStructures.DisallowYodaComparison" />
+    <rule ref="SlevomatCodingStandard.ControlStructures.NewWithParentheses" />
+    <rule ref="SlevomatCodingStandard.ControlStructures.RequireNullSafeObjectOperator" />
+    <rule ref="SlevomatCodingStandard.ControlStructures.RequireTernaryOperator" />
+    <rule ref="SlevomatCodingStandard.ControlStructures.UselessIfConditionWithReturn" />
+    <rule ref="SlevomatCodingStandard.ControlStructures.UselessTernaryOperator" />
+    <rule ref="SlevomatCodingStandard.Functions.RequireArrowFunction" />
+    <rule ref="SlevomatCodingStandard.Functions.RequireTrailingCommaInCall" />
+    <rule ref="SlevomatCodingStandard.Functions.RequireTrailingCommaInDeclaration" />
+    <rule ref="SlevomatCodingStandard.Namespaces.AlphabeticallySortedUses" />
+    <rule ref="SlevomatCodingStandard.Namespaces.DisallowGroupUse" />
+    <rule ref="SlevomatCodingStandard.Namespaces.NamespaceDeclaration" />
+    <rule ref="SlevomatCodingStandard.Namespaces.NamespaceSpacing" />
+    <rule ref="SlevomatCodingStandard.Namespaces.RequireOneNamespaceInFile" />
+    <rule ref="SlevomatCodingStandard.Namespaces.UseDoesNotStartWithBackslash" />
+    <rule ref="SlevomatCodingStandard.Namespaces.UseSpacing">
+        <properties>
+            <property name="linesCountBetweenUseTypes" value="1" />
+        </properties>
+    </rule>
+    <rule ref="SlevomatCodingStandard.PHP.ShortList" />
+    <rule ref="SlevomatCodingStandard.PHP.TypeCast" />
+    <rule ref="SlevomatCodingStandard.TypeHints.ReturnTypeHintSpacing" />
+    <rule ref="SlevomatCodingStandard.TypeHints.ParameterTypeHintSpacing" />
+    <!-- <<< Formatting -->
+
+</ruleset>

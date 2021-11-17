@@ -1,0 +1,35 @@
+grumphp:
+  ignore_unstaged_changes: true
+  hide_circumvention_tip: true
+  ascii: ~
+
+  fixer:
+    enabled: false
+
+  tasks:
+    composer_normalize:
+      indent_size: 4
+      indent_style: 'space'
+      no_update_lock: true
+      verbose: false
+
+    phan: ~
+
+    phpcs: ~
+
+    phpcsfixer:
+      config: '.php-cs-fixer.php'
+
+    phpmd:
+      ruleset: [ 'phpmd-ruleset' ]
+      whitelist_patterns: [ '/^src\/(.*)/' ]
+
+    phpmnd:
+      directory: 'src'
+
+    phpstan:
+      use_grumphp_paths: false
+
+    psalm: ~
+
+    securitychecker_local: ~

@@ -1,0 +1,56 @@
+name: Audit
+
+on: [push]
+
+jobs:
+  audit:
+    name: Audit
+    strategy:
+      matrix:
+        php-version: [ '8.0', '8.1' ]
+      fail-fast: false
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v2
+
+      - name: Setup PHP
+        uses: shivammathur/setup-php@v2
+        with:
+          php-version: ${{ matrix.php-version }}
+          tools: composer:v2
+          coverage: xdebug
+        env:
+          fail-fast: true
+
+      - name: Get composer cache directory
+        id: composer-cache
+        run: echo "::set-output name=dir::$(composer config cache-files-dir)"
+
+      - name: Cache dependencies
+        uses: actions/cache@v2
+        with:
+          path: ${{ steps.composer-cache.outputs.dir }}
+          key: ${{ runner.os }}-composer-${{ hashFiles('**/composer.lock') }}
+          restore-keys: ${{ runner.os }}-composer-
+
+      - name: Install dependencies
+        run: |
+          echo "::group::composer install"
+          composer install --no-interaction
+          echo "::endgroup::"
+          echo "::group::phpunit install"
+          vendor/bin/simple-phpunit install
+          echo "::endgroup::"
+
+      - name: Audit
+        uses: docker://nbgrp/auditor:latest
+
+      - name: Tests
+        run: vendor/bin/simple-phpunit
+
+      - name: Codecov
+        uses: codecov/codecov-action@v2
+        with:
+          token: ${{ secrets.CODECOV_TOKEN }}
+          files: ./clover.xml

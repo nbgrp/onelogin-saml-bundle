@@ -1,0 +1,52 @@
+{
+    "name": "nbgrp/onelogin-saml-bundle",
+    "type": "symfony-bundle",
+    "description": "OneLogin SAML Symfony Bundle",
+    "keywords": [
+        "SAML",
+        "OneLogin",
+        "multiple IdP",
+        "SSO"
+    ],
+    "license": "BSD-3-Clause",
+    "authors": [
+        {
+            "name": "Alexander Menshchikov",
+            "email": "amenshchikov@gmail.com"
+        }
+    ],
+    "require": {
+        "php": "^8.0",
+        "onelogin/php-saml": "^4.0",
+        "psr/log": "*",
+        "symfony/config": "^6.0",
+        "symfony/dependency-injection": "^6.0",
+        "symfony/event-dispatcher-contracts": "^3.0",
+        "symfony/framework-bundle": "^6.0",
+        "symfony/http-foundation": "^6.0",
+        "symfony/http-kernel": "^6.0",
+        "symfony/routing": "^6.0",
+        "symfony/security-bundle": "^6.0",
+        "symfony/security-core": "^6.0",
+        "symfony/security-http": "^6.0"
+    },
+    "require-dev": {
+        "doctrine/orm": "^2.3 || ^3.0",
+        "roave/security-advisories": "dev-latest",
+        "symfony/event-dispatcher": "^6.0",
+        "symfony/phpunit-bridge": "^6.0"
+    },
+    "autoload": {
+        "psr-4": {
+            "Nbgrp\\OneloginSamlBundle\\": "src/"
+        }
+    },
+    "autoload-dev": {
+        "psr-4": {
+            "Nbgrp\\Tests\\OneloginSamlBundle\\": "tests/"
+        }
+    },
+    "scripts": {
+        "nba": "docker run -it --rm -v \"$(pwd)\":\"/app\" --workdir /app nbgrp/auditor:latest"
+    }
+}
