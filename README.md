@@ -1,13 +1,13 @@
 # OneloginSamlBundle
 
-[![GitLab Release (latest by SemVer)](https://img.shields.io/gitlab/v/release/nbgrp/onelogin-saml-bundle?label=stable)](//packagist.org/packages/nbgrp/onelogin-saml-bundle)
-[![GitLab Release (latest by SemVer pre-release)](https://img.shields.io/gitlab/v/release/nbgrp/onelogin-saml-bundle?include_prereleases&label=unstable)](//packagist.org/packages/nbgrp/onelogin-saml-bundle)
-[![GitHub all releases](https://img.shields.io/github/downloads/nbgrp/onelogin-saml-bundle/total?color=%230A7BBB)](//packagist.org/packages/nbgrp/onelogin-saml-bundle)
-[![GitHub](https://img.shields.io/github/license/nbgrp/onelogin-saml-bundle?color=%234A8F80)](//packagist.org/packages/nbgrp/onelogin-saml-bundle)
+[![Latest Stable Version](http://poser.pugx.org/nbgrp/onelogin-saml-bundle/v)](https://packagist.org/packages/nbgrp/onelogin-saml-bundle)
+[![Latest Unstable Version](http://poser.pugx.org/nbgrp/onelogin-saml-bundle/v/unstable)](https://packagist.org/packages/nbgrp/onelogin-saml-bundle)
+[![Total Downloads](http://poser.pugx.org/nbgrp/onelogin-saml-bundle/downloads)](https://packagist.org/packages/nbgrp/onelogin-saml-bundle)
+[![License](http://poser.pugx.org/nbgrp/onelogin-saml-bundle/license)](https://packagist.org/packages/nbgrp/onelogin-saml-bundle)
 
-[![Packagist PHP Version Support](https://img.shields.io/packagist/php-v/nbgrp/onelogin-saml-bundle?color=%237A7EB1)](https://packagist.org/packages/nbgrp/onelogin-saml-bundle)
+[![PHP Version Require](http://poser.pugx.org/nbgrp/onelogin-saml-bundle/require/php)](https://packagist.org/packages/nbgrp/onelogin-saml-bundle)
 [![Codecov](https://codecov.io/gh/nbgrp/onelogin-saml-bundle/branch/1.x/graph/badge.svg?token=H17751BTW4)](https://codecov.io/gh/nbgrp/onelogin-saml-bundle)
-[![Audit](https://github.com/nbgrp/onelogin-saml-bundle/actions/workflows/audit.yml/badge.svg)](/nbgrp/onelogin-saml-bundle/actions/workflows/audit.yml)
+[![Audit](https://github.com/nbgrp/onelogin-saml-bundle/actions/workflows/audit.yml/badge.svg)](https://github.com/nbgrp/onelogin-saml-bundle/actions/workflows/audit.yml)
 
 [![SymfonyInsight](https://insight.symfony.com/projects/ed7b9263-179c-442a-9f45-6877e4e6dbdb/small.svg)](https://insight.symfony.com/projects/ed7b9263-179c-442a-9f45-6877e4e6dbdb)
 
