@@ -18,7 +18,11 @@ class SamlUserProvider implements UserProviderInterface
     public function __construct(
         protected string $userClass,
         protected array $defaultRoles,
-    ) {}
+    ) {
+        if (!is_a($userClass, UserInterface::class, true)) {
+            throw new \InvalidArgumentException('The $userClass argument should be a class implementing the '.UserInterface::class.' interface.');
+        }
+    }
 
     public function loadUserByIdentifier(string $identifier): UserInterface
     {
@@ -36,6 +40,6 @@ class SamlUserProvider implements UserProviderInterface
 
     public function supportsClass(string $class): bool
     {
-        return $this->userClass === $class || is_subclass_of($class, $this->userClass);
+        return is_a($class, $this->userClass, true);
     }
 }

@@ -45,6 +45,20 @@ final class SamlUserProviderFactoryTest extends TestCase
         $node->finalize($normalized);
     }
 
+    public function testInvalidUserClassInConfigurationException(): void
+    {
+        $nodeDefinition = new ArrayNodeDefinition($this->factory->getKey());
+        $this->factory->addConfiguration($nodeDefinition);
+
+        $node = $nodeDefinition->getNode();
+        /** @var array $normalized */
+        $normalized = $node->normalize(['user_class' => \stdClass::class]);
+
+        $this->expectException(InvalidConfigurationException::class);
+        $this->expectExceptionMessage('Invalid configuration for path "saml.user_class": You should provide user class implementing Symfony\Component\Security\Core\User\UserInterface interface.');
+        $node->finalize($normalized);
+    }
+
     public function testCreate(): void
     {
         $container = new ContainerBuilder();

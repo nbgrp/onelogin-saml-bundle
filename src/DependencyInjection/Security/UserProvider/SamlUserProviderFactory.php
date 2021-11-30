@@ -8,6 +8,7 @@ use Symfony\Bundle\SecurityBundle\DependencyInjection\Security\UserProvider\User
 use Symfony\Component\Config\Definition\Builder\NodeDefinition;
 use Symfony\Component\DependencyInjection\ChildDefinition;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
+use Symfony\Component\Security\Core\User\UserInterface;
 
 class SamlUserProviderFactory implements UserProviderFactoryInterface
 {
@@ -37,6 +38,10 @@ class SamlUserProviderFactory implements UserProviderFactoryInterface
                 ->scalarNode('user_class')
                     ->isRequired()
                     ->cannotBeEmpty()
+                    ->validate()
+                        ->ifTrue(static fn ($value) => !is_a($value, UserInterface::class, true))
+                        ->thenInvalid('You should provide user class implementing '.UserInterface::class.' interface.')
+                    ->end()
                 ->end()
                 ->arrayNode('default_roles')
                     ->prototype('scalar')->end()

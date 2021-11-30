@@ -17,33 +17,36 @@ use Symfony\Component\Security\Core\User\UserInterface;
  */
 final class SamlUserProviderTest extends TestCase
 {
-    private SamlUserProvider $provider;
-
     public function testLoadUserByIdentifier(): void
     {
-        $user = $this->provider->loadUserByIdentifier('tester');
+        $provider = new SamlUserProvider(TestUser::class, ['ROLE_USER']);
+        $user = $provider->loadUserByIdentifier('tester');
 
         self::assertSame('tester', $user->getUserIdentifier());
-        self::assertSame(['ROLE_DEFAULT_USER'], $user->getRoles());
+        self::assertSame(['ROLE_USER'], $user->getRoles());
     }
 
     public function testRefreshUser(): void
     {
+        $provider = new SamlUserProvider(TestUser::class, ['ROLE_USER']);
         $user = new TestUser('foo');
-        self::assertSame($user, $this->provider->refreshUser($user));
+
+        self::assertSame($user, $provider->refreshUser($user));
     }
 
     public function testRefreshUnsupportedUser(): void
     {
+        $provider = new SamlUserProvider(TestUser::class, ['ROLE_USER']);
         $user = new InMemoryUser('foo', 'pass');
 
         $this->expectException(UnsupportedUserException::class);
-        $this->provider->refreshUser($user);
+        $provider->refreshUser($user);
     }
 
     public function testSupportsClass(): void
     {
-        self::assertTrue($this->provider->supportsClass(TestUser::class));
+        $provider = new SamlUserProvider(TestUser::class, ['ROLE_USER']);
+        self::assertTrue($provider->supportsClass(TestUser::class));
     }
 
     public function testSupportsSubclass(): void
@@ -52,8 +55,20 @@ final class SamlUserProviderTest extends TestCase
         self::assertTrue($provider->supportsClass(TestUser::class));
     }
 
-    protected function setUp(): void
+    public function testNotSupports(): void
     {
-        $this->provider = new SamlUserProvider(TestUser::class, ['ROLE_DEFAULT_USER']);
+        $provider = new SamlUserProvider(TestUser::class, ['ROLE_USER']);
+        self::assertFalse($provider->supportsClass(InMemoryUser::class));
+    }
+
+    public function testInvalidUserClass(): void
+    {
+        $this->expectException(\InvalidArgumentException::class);
+        $this->expectExceptionMessage('The $userClass argument should be a class implementing the Symfony\Component\Security\Core\User\UserInterface interface.');
+        /**
+         * @psalm-suppress InvalidArgument
+         * @phpstan-ignore-next-line
+         */
+        new SamlUserProvider(\stdClass::class, ['ROLE_ANY']);
     }
 }
