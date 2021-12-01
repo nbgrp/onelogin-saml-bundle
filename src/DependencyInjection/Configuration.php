@@ -22,7 +22,7 @@ class Configuration implements ConfigurationInterface
         // @formatter:off
         /** @phpstan-ignore-next-line */
         $rootNode
-            ->info('OneLogin PHP Symfony Bundle configuration')
+            ->info('nb:group OneLogin PHP Symfony Bundle configuration')
             ->children()
                 ->arrayNode('onelogin_settings')
                     ->isRequired()
