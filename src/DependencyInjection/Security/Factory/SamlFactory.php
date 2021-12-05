@@ -51,7 +51,7 @@ class SamlFactory extends AbstractFactory
             ->replaceArgument(6, array_intersect_key($config, $this->options))
         ;
 
-        if (\array_key_exists('user_factory', $config)) {
+        if (!empty($config['user_factory'])) {
             $authenticator->replaceArgument(7, new Reference((string) $config['user_factory']));
         }
 
