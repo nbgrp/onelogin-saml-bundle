@@ -10,12 +10,11 @@ insert_final_newline = true
 trim_trailing_whitespace = true
 max_line_length = 200
 
+[*.md]
+max_line_length = 100
+
 [{*.yaml,*.yml,*.neon}]
 indent_size = 2
 tab_width = 2
 ij_yaml_keep_indents_on_empty_lines = false
 ij_yaml_keep_line_breaks = true
-
-[{*.zsh,*.bash,*.sh}]
-indent_size = 2
-tab_width = 2

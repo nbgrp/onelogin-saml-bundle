@@ -1,14 +1,14 @@
 {
     "name": "nbgrp/onelogin-saml-bundle",
-    "type": "symfony-bundle",
     "description": "OneLogin SAML Symfony Bundle",
+    "license": "BSD-3-Clause",
+    "type": "symfony-bundle",
     "keywords": [
         "SAML",
         "OneLogin",
         "multiple IdP",
         "SSO"
     ],
-    "license": "BSD-3-Clause",
     "authors": [
         {
             "name": "Alexander Menshchikov",
@@ -46,6 +46,6 @@
         }
     },
     "scripts": {
-        "nba": "docker run -it --rm -v \"$(pwd)\":\"/app\" --workdir /app nbgrp/auditor:latest"
+        "nba": "docker run -it --rm -v $PWD:/app --workdir /app nbgrp/auditor:latest"
     }
 }

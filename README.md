@@ -27,8 +27,9 @@
 composer require nbgrp/onelogin-saml-bundle
 ```
 
-If you use Symfony Flex it enables the bundle automatically. Otherwise, to enable the bundle add
-the following code in `config/bundles.php`:
+If you use Symfony Flex it enables the bundle automatically. Otherwise, to enable the bundle add the
+following code in `config/bundles.php`:
+
 ``` php
 return [
     // ...
@@ -126,8 +127,8 @@ nbgrp_onelogin_saml:
 There are few extra parameters for `idp` and `sp` sections. You can read more about them from
 OneLogin PHP SAML docs.
 
-Instead of specify IdP and SP x509 certificates and private keys, you can store them in OneLogin
-PHP SAML [certs directory](https://github.com/onelogin/php-saml#certs) or use global constant
+Instead of specify IdP and SP x509 certificates and private keys, you can store them in OneLogin PHP
+SAML [certs directory](https://github.com/onelogin/php-saml#certs) or use global constant
 `ONELOGIN_CUSTOMPATH` to specify custom directory (complete path will be
 `ONELOGIN_CUSTOMPATH.'certs/'`).
 
@@ -175,8 +176,8 @@ nbgrp_saml:
 
 ### Multiple IdP
 
-You can configure more than one OneLogin PHP SAML settings for multiple IdP. To do this you need
-to specify SAML settings for each IdP (sections with `default` and `another` keys in configuration
+You can configure more than one OneLogin PHP SAML settings for multiple IdP. To do this you need to
+specify SAML settings for each IdP (sections with `default` and `another` keys in configuration
 above) and pass the name of the necessary IdP by a query string parameter `idp` or a request
 attribute with the same name. You can use another name with help of `idp_parameter_name` bundle
 parameter.
@@ -184,8 +185,8 @@ parameter.
 > To use appropriate SAML settings, all requests to bundle routes should contain correct IdP
 > parameter.
 
-If a request has no query parameter or attribute with IdP value, the first key in `onelogin_settings`
-section will be used as default IdP.
+If a request has no query parameter or attribute with IdP value, the first key
+in `onelogin_settings` section will be used as default IdP.
 
 ### Using reverse proxy
 
@@ -376,9 +377,10 @@ security:
 To use non-default entity manager specify it name by `nbgrp_onelogin_saml.entity_manager_name`
 bundle configuration parameter.
 
-User persistence is performing by event listeners `Nbgrp\OneloginSamlBundle\EventListener\User\UserCreatedListener`
-and `Nbgrp\OneloginSamlBundle\EventListener\User\UserModifiedListener` that can be decorated if
-you need to override the default behavior.
+User persistence is performing by event
+listeners `Nbgrp\OneloginSamlBundle\EventListener\User\UserCreatedListener`
+and `Nbgrp\OneloginSamlBundle\EventListener\User\UserModifiedListener` that can be decorated if you
+need to override the default behavior.
 
 Also, you can make your own listeners for `Nbgrp\OneloginSamlBundle\Event\UserCreatedEvent`
 and `Nbgrp\OneloginSamlBundle\Event\UserModifiedEvent` events.
