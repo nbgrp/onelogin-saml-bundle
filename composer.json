@@ -45,6 +45,11 @@
             "Nbgrp\\Tests\\OneloginSamlBundle\\": "tests/"
         }
     },
+    "config": {
+        "allow-plugins": {
+            "composer/package-versions-deprecated": true
+        }
+    },
     "scripts": {
         "nba": "docker run -it --rm -v $PWD:/app --workdir /app nbgrp/auditor:latest"
     }
