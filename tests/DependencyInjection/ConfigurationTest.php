@@ -310,18 +310,6 @@ final class ConfigurationTest extends TestCase
 
     public function invalidOneLoginSettingsProvider(): \Generator
     {
-        yield 'No OneLogin settings' => [
-            'config' => [],
-            'expectedMessage' => 'The child config "onelogin_settings" under "nbgrp_onelogin_saml" must be configured.',
-        ];
-
-        yield 'Empty OneLogin settings' => [
-            'config' => [
-                'onelogin_settings' => [],
-            ],
-            'expectedMessage' => 'The path "nbgrp_onelogin_saml.onelogin_settings" should have at least 1 element(s) defined.',
-        ];
-
         yield 'Empty idp OneLogin settings' => [
             'config' => [
                 'onelogin_settings' => [

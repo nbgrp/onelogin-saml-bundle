@@ -25,8 +25,6 @@ class Configuration implements ConfigurationInterface
             ->info('nb:group OneLogin PHP Symfony Bundle configuration')
             ->children()
                 ->arrayNode('onelogin_settings')
-                    ->isRequired()
-                    ->requiresAtLeastOneElement()
                     ->disallowNewKeysInSubsequentConfigs()
                     ->useAttributeAsKey('name')
                     ->normalizeKeys(false)
