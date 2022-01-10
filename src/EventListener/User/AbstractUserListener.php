@@ -13,7 +13,7 @@ abstract class AbstractUserListener
         protected bool $needPersist,
     ) {}
 
-    protected function handleEvent(AbstractUserEvent $event): void
+    public function __invoke(AbstractUserEvent $event): void
     {
         if ($this->needPersist && $this->entityManager instanceof EntityManagerInterface) {
             $this->entityManager->persist($event->getUser());

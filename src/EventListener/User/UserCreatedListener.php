@@ -3,12 +3,6 @@
 
 namespace Nbgrp\OneloginSamlBundle\EventListener\User;
 
-use Nbgrp\OneloginSamlBundle\Event\UserCreatedEvent;
-
 class UserCreatedListener extends AbstractUserListener
 {
-    public function __invoke(UserCreatedEvent $event): void
-    {
-        $this->handleEvent($event);
-    }
 }

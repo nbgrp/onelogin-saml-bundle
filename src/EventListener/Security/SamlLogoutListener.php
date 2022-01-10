@@ -8,6 +8,7 @@ use Nbgrp\OneloginSamlBundle\Onelogin\AuthRegistryInterface;
 use Nbgrp\OneloginSamlBundle\Security\Http\Authenticator\SamlAuthenticator;
 use Nbgrp\OneloginSamlBundle\Security\Http\Authenticator\Token\SamlToken;
 use OneLogin\Saml2\Auth;
+use Symfony\Component\EventDispatcher\Attribute\AsEventListener;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\Security\Http\Event\LogoutEvent;
 
@@ -21,7 +22,8 @@ final class SamlLogoutListener
         private IdpResolverInterface $idpResolver,
     ) {}
 
-    public function __invoke(LogoutEvent $event): void
+    #[AsEventListener(LogoutEvent::class)]
+    public function processSingleLogout(LogoutEvent $event): void
     {
         $authService = $this->getAuthService($event->getRequest());
         if (!$authService) {

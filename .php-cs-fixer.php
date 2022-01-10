@@ -9,6 +9,7 @@ return (new PhpCsFixer\Config())
             ->notPath([
                 'src/DependencyInjection/Configuration.php',
                 'src/DependencyInjection/Security/UserProvider/SamlUserProviderFactory.php',
+                'src/Resources/config/services.php',
             ])
     )
     ->setRiskyAllowed(true)

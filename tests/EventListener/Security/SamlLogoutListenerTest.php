@@ -39,7 +39,7 @@ final class SamlLogoutListenerTest extends TestCase
             ->willReturn($token)
         ;
 
-        (new SamlLogoutListener($authRegistry, $ipdResolver))($event);
+        (new SamlLogoutListener($authRegistry, $ipdResolver))->processSingleLogout($event);
     }
 
     public function successLogoutProvider(): \Generator

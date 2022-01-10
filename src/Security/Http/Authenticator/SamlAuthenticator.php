@@ -13,6 +13,7 @@ use Nbgrp\OneloginSamlBundle\Security\User\SamlUserFactoryInterface;
 use Nbgrp\OneloginSamlBundle\Security\User\SamlUserInterface;
 use OneLogin\Saml2\Auth;
 use Psr\Log\LoggerInterface;
+use Symfony\Component\DependencyInjection\Attribute\AutoconfigureTag;
 use Symfony\Component\HttpFoundation\RedirectResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
@@ -34,6 +35,7 @@ use Symfony\Component\Security\Http\EntryPoint\AuthenticationEntryPointInterface
 use Symfony\Component\Security\Http\HttpUtils;
 use Symfony\Contracts\EventDispatcher\EventDispatcherInterface;
 
+#[AutoconfigureTag('monolog.logger', ['channel' => 'security'])]
 class SamlAuthenticator implements AuthenticatorInterface, AuthenticationEntryPointInterface
 {
     public const SESSION_INDEX_ATTRIBUTE = '_saml_session_index';
