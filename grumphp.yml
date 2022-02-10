@@ -26,6 +26,8 @@ grumphp:
 
     phpmnd:
       directory: 'src'
+      exclude_name:
+        - 'Configuration.php'
 
     phpstan:
       use_grumphp_paths: false
