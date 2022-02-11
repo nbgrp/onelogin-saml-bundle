@@ -183,26 +183,26 @@ class SamlAuthenticator implements AuthenticatorInterface, AuthenticationEntryPo
 
     protected function extractIdentifier(Auth $oneLoginAuth, array $attributes): string
     {
-        if (\array_key_exists('identifier_attribute', $this->options)) {
-            $identifierAttribute = (string) $this->options['identifier_attribute'];
-            if (!\array_key_exists($identifierAttribute, $attributes)) {
-                throw new \RuntimeException('Attribute "'.$identifierAttribute.'" not found in SAML data.');
-            }
-
-            $identifier = $attributes[$identifierAttribute];
-            if (\is_array($identifier)) {
-                /** @var mixed $identifier */
-                $identifier = reset($identifier);
-            }
-
-            if (!\is_string($identifier)) {
-                throw new \RuntimeException('Attribute "'.$identifierAttribute.'" does not contain valid user identifier.');
-            }
-
-            return $identifier;
+        if (empty($this->options['identifier_attribute'])) {
+            return $oneLoginAuth->getNameId();
         }
 
-        return $oneLoginAuth->getNameId();
+        $identifierAttribute = (string) $this->options['identifier_attribute'];
+        if (!\array_key_exists($identifierAttribute, $attributes)) {
+            throw new \RuntimeException('Attribute "'.$identifierAttribute.'" not found in SAML data.');
+        }
+
+        $identifier = $attributes[$identifierAttribute];
+        if (\is_array($identifier)) {
+            /** @var mixed $identifier */
+            $identifier = reset($identifier);
+        }
+
+        if (!\is_string($identifier)) {
+            throw new \RuntimeException('Attribute "'.$identifierAttribute.'" does not contain valid user identifier.');
+        }
+
+        return $identifier;
     }
 
     private function getOneLoginAuth(Request $request): Auth
