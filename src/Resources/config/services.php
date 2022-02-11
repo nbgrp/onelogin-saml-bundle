@@ -11,7 +11,6 @@ use Nbgrp\OneloginSamlBundle\Onelogin;
 use Nbgrp\OneloginSamlBundle\Security;
 use Psr\Log\LoggerInterface;
 use Symfony\Component\Security\Http\HttpUtils;
-use Symfony\Contracts\EventDispatcher\EventDispatcherInterface;
 
 return static function (ContainerConfigurator $container): void {
     $src = \dirname(__DIR__, 2);
@@ -76,9 +75,8 @@ return static function (ContainerConfigurator $container): void {
                 /* 5 */ abstract_arg('failure handler'),
                 /* 6 */ abstract_arg('options'),
                 /* 7 */ null,  // user factory
-                /* 8 */ service(EventDispatcherInterface::class)->nullOnInvalid(),
-                /* 9 */ service(LoggerInterface::class)->nullOnInvalid(),
-                /* 10 */ param('nbgrp_onelogin_saml.idp_parameter_name'),
+                /* 8 */ service(LoggerInterface::class)->nullOnInvalid(),
+                /* 9 */ param('nbgrp_onelogin_saml.idp_parameter_name'),
             ])
     ;
 };

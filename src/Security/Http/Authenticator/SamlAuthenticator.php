@@ -7,6 +7,7 @@ use Nbgrp\OneloginSamlBundle\Event\UserCreatedEvent;
 use Nbgrp\OneloginSamlBundle\Event\UserModifiedEvent;
 use Nbgrp\OneloginSamlBundle\Idp\IdpResolverInterface;
 use Nbgrp\OneloginSamlBundle\Onelogin\AuthRegistryInterface;
+use Nbgrp\OneloginSamlBundle\Security\Http\Authenticator\Passport\Badge\DeferredEventBadge;
 use Nbgrp\OneloginSamlBundle\Security\Http\Authenticator\Passport\Badge\SamlAttributesBadge;
 use Nbgrp\OneloginSamlBundle\Security\Http\Authenticator\Token\SamlToken;
 use Nbgrp\OneloginSamlBundle\Security\User\SamlUserFactoryInterface;
@@ -33,7 +34,6 @@ use Symfony\Component\Security\Http\Authenticator\Passport\Passport;
 use Symfony\Component\Security\Http\Authenticator\Passport\SelfValidatingPassport;
 use Symfony\Component\Security\Http\EntryPoint\AuthenticationEntryPointInterface;
 use Symfony\Component\Security\Http\HttpUtils;
-use Symfony\Contracts\EventDispatcher\EventDispatcherInterface;
 
 #[AutoconfigureTag('monolog.logger', ['channel' => 'security'])]
 class SamlAuthenticator implements AuthenticatorInterface, AuthenticationEntryPointInterface
@@ -50,7 +50,6 @@ class SamlAuthenticator implements AuthenticatorInterface, AuthenticationEntryPo
         private AuthenticationFailureHandlerInterface $failureHandler,
         private array $options,
         private ?SamlUserFactoryInterface $userFactory,
-        private ?EventDispatcherInterface $eventDispatcher,
         private ?LoggerInterface $logger,
         private string $idpParameterName,
     ) {}
@@ -138,15 +137,17 @@ class SamlAuthenticator implements AuthenticatorInterface, AuthenticationEntryPo
         $attributes = $this->extractAttributes($oneLoginAuth);
         $this->logger?->debug('SAML attributes extracted', $attributes);
 
+        $deferredEventBadge = new DeferredEventBadge();
+
         $userBadge = new UserBadge(
             $this->extractIdentifier($oneLoginAuth, $attributes),
-            function (string $identifier) use ($attributes) {
+            function (string $identifier) use ($deferredEventBadge, $attributes) {
                 try {
                     try {
                         $user = $this->userProvider->loadUserByIdentifier($identifier);
                         if ($user instanceof SamlUserInterface) {
                             $user->setSamlAttributes($attributes);
-                            $this->eventDispatcher?->dispatch(new UserModifiedEvent($user));
+                            $deferredEventBadge->setEvent(new UserModifiedEvent($user));
                         }
                     } catch (UserNotFoundException $exception) {
                         if (!$this->userFactory instanceof SamlUserFactoryInterface) {
@@ -154,7 +155,7 @@ class SamlAuthenticator implements AuthenticatorInterface, AuthenticationEntryPo
                         }
 
                         $user = $this->userFactory->createUser($identifier, $attributes);
-                        $this->eventDispatcher?->dispatch(new UserCreatedEvent($user));
+                        $deferredEventBadge->setEvent(new UserCreatedEvent($user));
                     }
                 } catch (\Throwable $exception) {
                     if ($exception instanceof UserNotFoundException) {
@@ -168,7 +169,10 @@ class SamlAuthenticator implements AuthenticatorInterface, AuthenticationEntryPo
             },
         );
 
-        return new SelfValidatingPassport($userBadge, [new SamlAttributesBadge($attributes)]);
+        return new SelfValidatingPassport($userBadge, [
+            new SamlAttributesBadge($attributes),
+            $deferredEventBadge,
+        ]);
     }
 
     protected function extractAttributes(Auth $oneLoginAuth): array

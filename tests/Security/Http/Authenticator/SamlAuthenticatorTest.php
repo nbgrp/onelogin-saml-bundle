@@ -9,6 +9,7 @@ use Nbgrp\OneloginSamlBundle\Idp\IdpResolver;
 use Nbgrp\OneloginSamlBundle\Idp\IdpResolverInterface;
 use Nbgrp\OneloginSamlBundle\Onelogin\AuthRegistry;
 use Nbgrp\OneloginSamlBundle\Onelogin\AuthRegistryInterface;
+use Nbgrp\OneloginSamlBundle\Security\Http\Authenticator\Passport\Badge\DeferredEventBadge;
 use Nbgrp\OneloginSamlBundle\Security\Http\Authenticator\Passport\Badge\SamlAttributesBadge;
 use Nbgrp\OneloginSamlBundle\Security\Http\Authenticator\SamlAuthenticator;
 use Nbgrp\OneloginSamlBundle\Security\User\SamlUserFactoryInterface;
@@ -16,7 +17,6 @@ use Nbgrp\OneloginSamlBundle\Security\User\SamlUserInterface;
 use Nbgrp\Tests\OneloginSamlBundle\TestUser;
 use OneLogin\Saml2\Auth;
 use OneLogin\Saml2\Settings;
-use PHPUnit\Framework\Constraint\IsInstanceOf;
 use PHPUnit\Framework\TestCase;
 use Psr\Log\LoggerInterface;
 use Symfony\Component\HttpFoundation\Request;
@@ -34,6 +34,7 @@ use Symfony\Component\Security\Http\Authentication\AuthenticationSuccessHandlerI
 use Symfony\Component\Security\Http\Authenticator\Passport\Badge\UserBadge;
 use Symfony\Component\Security\Http\Authenticator\Passport\SelfValidatingPassport;
 use Symfony\Component\Security\Http\HttpUtils;
+use Symfony\Contracts\EventDispatcher\Event;
 use Symfony\Contracts\EventDispatcher\EventDispatcherInterface;
 
 /**
@@ -286,16 +287,28 @@ final class SamlAuthenticatorTest extends TestCase
             authRegistry: $authRegistry,
             options: $options,
             samlUserFactory: $samlUserFactory,
-            eventDispatcher: $eventDispatcher,
         );
 
         $passport = $authenticator->authenticate($request);
-
         self::assertSame($expectedUserIdentifier, $passport->getUser()->getUserIdentifier());
 
         /** @var SamlAttributesBadge $badge */
         $badge = $passport->getBadge(SamlAttributesBadge::class);
         self::assertSame($expectedSamlAttributes, $badge->getAttributes());
+
+        if (!$eventDispatcher) {
+            return;
+        }
+
+        /** @var DeferredEventBadge $deferredEventBadge */
+        $deferredEventBadge = $passport->getBadge(DeferredEventBadge::class);
+        self::assertInstanceOf(DeferredEventBadge::class, $deferredEventBadge);
+
+        /** @var Event $deferredEvent */
+        $deferredEvent = $deferredEventBadge->getEvent();
+        self::assertInstanceOf(Event::class, $deferredEvent);
+
+        $eventDispatcher->dispatch($deferredEvent);
     }
 
     public function successAuthenticateProvider(): \Generator
@@ -406,7 +419,7 @@ final class SamlAuthenticatorTest extends TestCase
             $eventDispatcher
                 ->expects(self::once())
                 ->method('dispatch')
-                ->with(new IsInstanceOf(UserCreatedEvent::class))
+                ->with(self::isInstanceOf(UserCreatedEvent::class))
             ;
 
             return [
@@ -479,7 +492,7 @@ final class SamlAuthenticatorTest extends TestCase
             $eventDispatcher
                 ->expects(self::once())
                 ->method('dispatch')
-                ->with(new IsInstanceOf(UserModifiedEvent::class))
+                ->with(self::isInstanceOf(UserModifiedEvent::class))
             ;
 
             return [
@@ -756,7 +769,6 @@ final class SamlAuthenticatorTest extends TestCase
         ?AuthenticationFailureHandlerInterface $authenticationFailureHandler = null,
         array $options = [],
         ?SamlUserFactoryInterface $samlUserFactory = null,
-        ?EventDispatcherInterface $eventDispatcher = null,
         ?LoggerInterface $logger = null,
         string $idpParameterName = 'idp',
     ): SamlAuthenticator {
@@ -769,7 +781,6 @@ final class SamlAuthenticatorTest extends TestCase
             $authenticationFailureHandler ?? $this->createStub(AuthenticationFailureHandlerInterface::class),
             $options,
             $samlUserFactory,
-            $eventDispatcher,
             $logger,
             $idpParameterName,
         );
