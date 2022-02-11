@@ -117,6 +117,7 @@ final class SamlAuthenticatorTest extends TestCase
 
         $this->expectException(SessionUnavailableException::class);
         $this->expectExceptionMessage($expectedMessage);
+
         $authenticator->authenticate($request);
     }
 
@@ -138,8 +139,11 @@ final class SamlAuthenticatorTest extends TestCase
     /**
      * @dataProvider authenticateOneLoginErrorsExceptionProvider
      */
-    public function testAuthenticateOneLoginErrorsException(IdpResolverInterface $idpResolver, AuthRegistryInterface $authRegistry, string $expectedMessage): void
-    {
+    public function testAuthenticateOneLoginErrorsException(
+        IdpResolverInterface $idpResolver,
+        AuthRegistryInterface $authRegistry,
+        string $expectedMessage,
+    ): void {
         $request = Request::create('/');
         $request->setSession(new Session(new MockArraySessionStorage()));
 
@@ -158,6 +162,7 @@ final class SamlAuthenticatorTest extends TestCase
 
         $this->expectException(AuthenticationException::class);
         $this->expectExceptionMessage($expectedMessage);
+
         $authenticator->authenticate($request);
     }
 
@@ -244,14 +249,23 @@ final class SamlAuthenticatorTest extends TestCase
 
         $this->expectException(AuthenticationServiceException::class);
         $this->expectExceptionMessage('There is no configured Auth services.');
+
         $authenticator->authenticate($request);
     }
 
     /**
      * @dataProvider successAuthenticateProvider
      */
-    public function testSuccessAuthenticate(Auth $auth, ?UserProviderInterface $userProvider, ?SamlUserFactoryInterface $samlUserFactory, ?EventDispatcherInterface $eventDispatcher, array $options, ?string $lastRequestId, string $expectedUserIdentifier, array $expectedSamlAttributes): void
-    {
+    public function testSuccessAuthenticate(
+        Auth $auth,
+        ?UserProviderInterface $userProvider,
+        ?SamlUserFactoryInterface $samlUserFactory,
+        ?EventDispatcherInterface $eventDispatcher,
+        array $options,
+        ?string $lastRequestId,
+        string $expectedUserIdentifier,
+        array $expectedSamlAttributes,
+    ): void {
         $request = Request::create('/');
         $session = new Session(new MockArraySessionStorage());
         if ($lastRequestId) {
@@ -494,8 +508,14 @@ final class SamlAuthenticatorTest extends TestCase
      *
      * @param class-string<\Throwable> $expectedException
      */
-    public function testAuthenticateException(Auth $auth, ?UserProviderInterface $userProvider, ?SamlUserFactoryInterface $samlUserFactory, array $options, string $expectedException, ?string $expectedMessage): void
-    {
+    public function testAuthenticateException(
+        Auth $auth,
+        ?UserProviderInterface $userProvider,
+        ?SamlUserFactoryInterface $samlUserFactory,
+        array $options,
+        string $expectedException,
+        ?string $expectedMessage,
+    ): void {
         $request = Request::create('/');
         $request->setSession(new Session(new MockArraySessionStorage()));
 
@@ -518,6 +538,7 @@ final class SamlAuthenticatorTest extends TestCase
         if ($expectedMessage !== null) {
             $this->expectExceptionMessage($expectedMessage);
         }
+
         $authenticator->authenticate($request)->getUser();
     }
 
@@ -684,6 +705,7 @@ final class SamlAuthenticatorTest extends TestCase
 
         $this->expectException(\LogicException::class);
         $this->expectExceptionMessage('Passport should contains a "Nbgrp\OneloginSamlBundle\Security\Http\Authenticator\Passport\Badge\SamlAttributesBadge" badge.');
+
         $authenticator->createToken($passport, 'foo');
     }
 

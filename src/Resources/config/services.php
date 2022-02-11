@@ -27,9 +27,35 @@ return static function (ContainerConfigurator $container): void {
                 service('security.firewall.map'),
             ])
 
+        ->set(EventListener\Security\SamlLogoutListener::class)
+            ->args([
+                service(Onelogin\AuthRegistryInterface::class),
+                service(Idp\IdpResolverInterface::class),
+            ])
+
+        ->set(EventListener\User\UserCreatedListener::class)
+            ->abstract()
+            ->args([
+                service(EntityManagerInterface::class)->nullOnInvalid(),
+                false,  // persist_user
+            ])
+
+        ->set(EventListener\User\UserModifiedListener::class)
+            ->abstract()
+            ->args([
+                service(EntityManagerInterface::class)->nullOnInvalid(),
+                false,  // persist_user
+            ])
+
         ->set(Idp\IdpResolverInterface::class, Idp\IdpResolver::class)
             ->args([
                 param('nbgrp_onelogin_saml.idp_parameter_name'),
+            ])
+
+        ->set(Onelogin\AuthArgumentResolver::class)
+            ->args([
+                service(Onelogin\AuthRegistryInterface::class),
+                service(Idp\IdpResolverInterface::class),
             ])
 
         ->set(Onelogin\AuthRegistryInterface::class, Onelogin\AuthRegistry::class)
@@ -47,20 +73,6 @@ return static function (ContainerConfigurator $container): void {
                 /* 8 */ service(EventDispatcherInterface::class)->nullOnInvalid(),
                 /* 9 */ service(LoggerInterface::class)->nullOnInvalid(),
                 /* 10 */ param('nbgrp_onelogin_saml.idp_parameter_name'),
-            ])
-
-        ->set(EventListener\User\UserCreatedListener::class)
-            ->abstract()
-            ->args([
-                service(EntityManagerInterface::class)->nullOnInvalid(),
-                false,  // persist_user
-            ])
-
-        ->set(EventListener\User\UserModifiedListener::class)
-            ->abstract()
-            ->args([
-                service(EntityManagerInterface::class)->nullOnInvalid(),
-                false,  // persist_user
             ])
     ;
 };
