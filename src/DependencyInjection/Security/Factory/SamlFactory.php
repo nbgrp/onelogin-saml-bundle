@@ -67,13 +67,19 @@ class SamlFactory extends AbstractFactory
         $container->setDefinition('nbgrp_onelogin_saml.user_created_listener.'.$firewallName, new ChildDefinition(UserCreatedListener::class))
             ->replaceArgument(1, $config['persist_user'] ?? false)
             ->addTag('nbgrp.saml_user_listener')
-            ->addTag('kernel.event_listener', ['event' => UserCreatedEvent::class])
+            ->addTag('kernel.event_listener', [
+                'event' => UserCreatedEvent::class,
+                'dispatcher' => 'security.event_dispatcher.'.$firewallName,
+            ])
         ;
 
         $container->setDefinition('nbgrp_onelogin_saml.user_modified_listener.'.$firewallName, new ChildDefinition(UserModifiedListener::class))
             ->replaceArgument(1, $config['persist_user'] ?? false)
             ->addTag('nbgrp.saml_user_listener')
-            ->addTag('kernel.event_listener', ['event' => UserModifiedEvent::class])
+            ->addTag('kernel.event_listener', [
+                'event' => UserModifiedEvent::class,
+                'dispatcher' => 'security.event_dispatcher.'.$firewallName,
+            ])
         ;
     }
 }
