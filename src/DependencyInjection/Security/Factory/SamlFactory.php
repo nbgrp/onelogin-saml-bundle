@@ -38,9 +38,7 @@ class SamlFactory extends AbstractFactory
         return 'saml';
     }
 
-    /**
-     * @psalm-suppress MixedArgument
-     */
+    /** @psalm-suppress MixedArgument */
     public function createAuthenticator(ContainerBuilder $container, string $firewallName, array $config, string $userProviderId): string
     {
         $authenticatorId = 'security.authenticator.saml.'.$firewallName;

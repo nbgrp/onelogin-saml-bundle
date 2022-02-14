@@ -14,9 +14,7 @@ use Symfony\Component\DependencyInjection\Loader\PhpFileLoader;
  */
 class NbgrpOneloginSamlExtension extends Extension
 {
-    /**
-     * @psalm-suppress MixedArgument
-     */
+    /** @psalm-suppress MixedArgument */
     public function load(array $configs, ContainerBuilder $container): void
     {
         $loader = new PhpFileLoader($container, new FileLocator(\dirname(__DIR__).'/Resources/config'));

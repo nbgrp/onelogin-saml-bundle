@@ -15,15 +15,14 @@ class SamlAuthenticationSuccessHandler extends DefaultAuthenticationSuccessHandl
 {
     public const RELAY_STATE = 'RelayState';
 
-    /**
-     * @psalm-suppress MixedArrayAccess
-     */
+    /** @psalm-suppress MixedArrayAccess */
     protected function determineTargetUrl(Request $request): string
     {
         if ($this->options['always_use_default_target_path']) {
             return (string) $this->options['default_target_path'];
         }
 
+        /** @psalm-suppress InvalidScalarArgument */
         $relayState = $request->query->get(self::RELAY_STATE, $request->request->get(self::RELAY_STATE));
         if ($relayState !== null && $this->httpUtils instanceof HttpUtils) {
             $relayState = (string) $relayState;
