@@ -4,6 +4,7 @@
 [![Latest Unstable Version](http://poser.pugx.org/nbgrp/onelogin-saml-bundle/v/unstable)](https://packagist.org/packages/nbgrp/onelogin-saml-bundle)
 [![Total Downloads](http://poser.pugx.org/nbgrp/onelogin-saml-bundle/downloads)](https://packagist.org/packages/nbgrp/onelogin-saml-bundle)
 [![License](http://poser.pugx.org/nbgrp/onelogin-saml-bundle/license)](https://packagist.org/packages/nbgrp/onelogin-saml-bundle)
+[![Gitter](https://badges.gitter.im/nbgrp/community.svg)](https://gitter.im/nbgrp/community)
 
 [![PHP Version Require](http://poser.pugx.org/nbgrp/onelogin-saml-bundle/require/php)](https://packagist.org/packages/nbgrp/onelogin-saml-bundle)
 [![Codecov](https://codecov.io/gh/nbgrp/onelogin-saml-bundle/branch/1.x/graph/badge.svg?token=H17751BTW4)](https://codecov.io/gh/nbgrp/onelogin-saml-bundle)
