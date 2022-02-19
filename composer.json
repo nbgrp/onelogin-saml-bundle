@@ -16,24 +16,23 @@
         }
     ],
     "require": {
-        "php": "^8.0",
-        "onelogin/php-saml": "^4.0",
-        "psr/log": "*",
-        "symfony/config": "^6.0",
-        "symfony/dependency-injection": "^6.0",
-        "symfony/event-dispatcher-contracts": "^3.0",
-        "symfony/http-foundation": "^6.0",
-        "symfony/http-kernel": "^6.0",
-        "symfony/routing": "^6.0",
-        "symfony/security-bundle": "^6.0",
-        "symfony/security-core": "^6.0",
-        "symfony/security-http": "^6.0"
+        "php": "^8",
+        "onelogin/php-saml": "^4",
+        "psr/log": "^1 || ^2 || ^3",
+        "symfony/config": "^6",
+        "symfony/dependency-injection": "^6",
+        "symfony/event-dispatcher-contracts": "^3",
+        "symfony/http-foundation": "^6",
+        "symfony/http-kernel": "^6",
+        "symfony/routing": "^6",
+        "symfony/security-bundle": "^6",
+        "symfony/security-core": "^6",
+        "symfony/security-http": "^6"
     },
     "require-dev": {
-        "doctrine/orm": "^2.3 || ^3.0",
-        "roave/security-advisories": "dev-latest",
-        "symfony/event-dispatcher": "^6.0",
-        "symfony/phpunit-bridge": "^6.0"
+        "doctrine/orm": "^2.3 || ^3",
+        "symfony/event-dispatcher": "^6",
+        "symfony/phpunit-bridge": "^6"
     },
     "autoload": {
         "psr-4": {
