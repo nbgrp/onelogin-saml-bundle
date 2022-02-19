@@ -46,7 +46,7 @@ be used yaml.
 
 > Check https://github.com/onelogin/php-saml#settings for more info about OneLogin PHP SAML settings.
 
-``` yml
+``` yaml
 nbgrp_onelogin_saml:
     onelogin_settings:
         default:
