@@ -31,7 +31,7 @@ jobs:
         uses: actions/cache@v2
         with:
           path: ${{ steps.composer-cache.outputs.dir }}
-          key: ${{ runner.os }}-composer-${{ hashFiles('**/composer.lock') }}
+          key: ${{ runner.os }}-composer-${{ hashFiles('**/composer.json') }}
           restore-keys: ${{ runner.os }}-composer-
 
       - name: Install dependencies
@@ -43,7 +43,7 @@ jobs:
           vendor/bin/simple-phpunit install
           echo "::endgroup::"
 
-      - name: Audit
+      - name: Auditor
         uses: docker://nbgrp/auditor:latest
 
       - name: Tests
