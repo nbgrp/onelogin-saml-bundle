@@ -24,7 +24,13 @@ final class AuthArgumentResolver implements ArgumentValueResolverInterface
 
     public function supports(Request $request, ArgumentMetadata $argument): bool
     {
-        return $argument->getType() === Auth::class;
+        $type = $argument->getType();
+
+        if (!$type) {
+            return false;
+        }
+
+        return is_a($type, Auth::class, true);
     }
 
     public function resolve(Request $request, ArgumentMetadata $argument): iterable

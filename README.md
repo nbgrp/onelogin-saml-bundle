@@ -61,12 +61,14 @@ nbgrp_onelogin_saml:
                     binding: 'urn:oasis:names:tc:SAML:2.0:bindings:HTTP-Redirect'
                 x509cert: 'MIIC...'
             sp:
-                entityId: 'https://myapp.com/saml/metadata'
+                # You may use <request_host> as a placeholder that will be replaced at runtime
+                # with the actual host, scheme and port of the request.
+                entityId: 'https://myapp.com/saml/metadata' # Optional. Defaults to '<request_host>/saml/metadata'
                 assertionConsumerService:
-                    url: 'https://myapp.com/saml/acs'
+                    url: 'https://myapp.com/saml/acs' # Optional. Defaults to '<request_host>/saml/acs'
                     binding: 'urn:oasis:names:tc:SAML:2.0:bindings:HTTP-POST'
                 singleLogoutService:
-                    url: 'https://myapp.com/saml/logout'
+                    url: 'https://myapp.com/saml/logout' # Optional. No default value.
                     binding: 'urn:oasis:names:tc:SAML:2.0:bindings:HTTP-Redirect'
                 privateKey: 'MIIE...'
             # Optional SAML settings

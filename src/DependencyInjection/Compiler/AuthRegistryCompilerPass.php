@@ -3,11 +3,13 @@
 
 namespace Nbgrp\OneloginSamlBundle\DependencyInjection\Compiler;
 
+use Nbgrp\OneloginSamlBundle\Onelogin\Auth;
 use Nbgrp\OneloginSamlBundle\Onelogin\AuthRegistryInterface;
-use OneLogin\Saml2\Auth;
 use Symfony\Component\DependencyInjection\Compiler\CompilerPassInterface;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\DependencyInjection\Definition;
+use Symfony\Component\DependencyInjection\Reference;
+use Symfony\Component\HttpFoundation\RequestStack;
 
 /**
  * Initialize AuthRegistry with Auth services according OneLogin settings.
@@ -25,7 +27,7 @@ class AuthRegistryCompilerPass implements CompilerPassInterface
 
         /** @var array $settings */
         foreach ($oneloginSettings as $key => $settings) {
-            $authRegistry->addMethodCall('addService', [$key, new Definition(Auth::class, [$settings])]);
+            $authRegistry->addMethodCall('addService', [$key, new Definition(Auth::class, [new Reference(RequestStack::class), $settings])]);
         }
     }
 }
