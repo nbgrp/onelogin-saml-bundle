@@ -44,7 +44,20 @@ To configure the bundle you need to add configuration in `config/packages/nbgrp_
 You can use any configuration format (yaml, xml, or php), but for convenience in this document will
 be used yaml.
 
-> Check https://github.com/onelogin/php-saml#settings for more info about OneLogin PHP SAML settings.
+> Check https://github.com/onelogin/php-saml#settings for more info about OneLogin PHP SAML
+> settings.
+
+> You can use `<request_scheme_and_host>` placeholder in the following configuration values which
+> will be replaced by the appropriate values from the `Request` object:
+>
+> * onelogin_settings.sp.entityId
+> * onelogin_settings.sp.assertionConsumerService.url
+> * onelogin_settings.sp.singleLogoutService.url
+> * onelogin_settings.baseurl
+>
+> Pay attention
+> to [trusted proxies settings](https://symfony.com/doc/current/deployment/proxies.html)
+> if you're running your application behind a load balancer or a reverse proxy.
 
 ``` yaml
 nbgrp_onelogin_saml:
@@ -61,16 +74,16 @@ nbgrp_onelogin_saml:
                     binding: 'urn:oasis:names:tc:SAML:2.0:bindings:HTTP-Redirect'
                 x509cert: 'MIIC...'
             sp:
-                entityId: 'https://myapp.com/saml/metadata'
+                entityId: 'https://myapp.com/saml/metadata'  #  Default: '<request_scheme_and_host>/saml/metadata'
                 assertionConsumerService:
-                    url: 'https://myapp.com/saml/acs'
+                    url: 'https://myapp.com/saml/acs'  #  Default: '<request_scheme_and_host>/saml/acs'
                     binding: 'urn:oasis:names:tc:SAML:2.0:bindings:HTTP-POST'
                 singleLogoutService:
-                    url: 'https://myapp.com/saml/logout'
+                    url: 'https://myapp.com/saml/logout'  #  Default: '<request_scheme_and_host>/saml/logout'
                     binding: 'urn:oasis:names:tc:SAML:2.0:bindings:HTTP-Redirect'
                 privateKey: 'MIIE...'
             # Optional SAML settings
-            baseurl: 'https://example.com'
+            baseurl: 'https://myapp.com/saml/'  #  Default: '<request_scheme_and_host>/saml/'
             strict: true
             debug: true
             security:

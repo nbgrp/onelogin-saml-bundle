@@ -37,12 +37,6 @@ final class ConfigurationTest extends TestCase
                                 'url' => 'http://example.com/sso',
                             ],
                         ],
-                        'sp' => [
-                            'entityId' => 'test-sp',
-                            'assertionConsumerService' => [
-                                'url' => 'http://example.com/saml/acs',
-                            ],
-                        ],
                     ],
                 ],
             ],
@@ -55,10 +49,14 @@ final class ConfigurationTest extends TestCase
                                 'url' => 'http://example.com/sso',
                             ],
                         ],
+                        'baseurl' => '<request_scheme_and_host>/saml/',
                         'sp' => [
-                            'entityId' => 'test-sp',
+                            'entityId' => '<request_scheme_and_host>/saml/metadata',
                             'assertionConsumerService' => [
-                                'url' => 'http://example.com/saml/acs',
+                                'url' => '<request_scheme_and_host>/saml/acs',
+                            ],
+                            'singleLogoutService' => [
+                                'url' => '<request_scheme_and_host>/saml/logout',
                             ],
                         ],
                     ],
@@ -287,8 +285,11 @@ final class ConfigurationTest extends TestCase
                                 'url' => 'http://example.com/saml/acs',
                                 'binding' => 'urn:oasis:names:tc:SAML:2.0:bindings:HTTP-POST',
                             ],
-                            'singleLogoutService' => [],
+                            'singleLogoutService' => [
+                                'url' => '<request_scheme_and_host>/saml/logout',
+                            ],
                         ],
+                        'baseurl' => '<request_scheme_and_host>/saml/',
                     ],
                 ],
                 'use_proxy_vars' => true,
@@ -386,41 +387,6 @@ final class ConfigurationTest extends TestCase
                 ],
             ],
             'expectedMessage' => 'The value "invalid" is not allowed for path "nbgrp_onelogin_saml.onelogin_settings.test.idp.certFingerprintAlgorithm". Permissible values: "sha1", "sha256", "sha384", "sha512"',
-        ];
-
-        yield 'Empty sp OneLogin settings' => [
-            'config' => [
-                'onelogin_settings' => [
-                    'test' => [
-                        'idp' => [
-                            'entityId' => 'idp-id',
-                            'singleSignOnService' => [
-                                'url' => 'http://example.org/sso',
-                            ],
-                        ],
-                    ],
-                ],
-            ],
-            'expectedMessage' => 'The child config "sp" under "nbgrp_onelogin_saml.onelogin_settings.test" must be configured.',
-        ];
-
-        yield 'Empty assertionConsumerService for SP OneLogin settings' => [
-            'config' => [
-                'onelogin_settings' => [
-                    'test' => [
-                        'idp' => [
-                            'entityId' => 'idp-id',
-                            'singleSignOnService' => [
-                                'url' => 'http://example.org/sso',
-                            ],
-                        ],
-                        'sp' => [
-                            'entityId' => 'sp-id',
-                        ],
-                    ],
-                ],
-            ],
-            'expectedMessage' => 'The child config "assertionConsumerService" under "nbgrp_onelogin_saml.onelogin_settings.test.sp" must be configured.',
         ];
 
         yield 'Invalid assertionConsumerService binding for SP OneLogin settings' => [

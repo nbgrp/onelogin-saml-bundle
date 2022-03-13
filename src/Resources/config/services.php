@@ -10,6 +10,7 @@ use Nbgrp\OneloginSamlBundle\Idp;
 use Nbgrp\OneloginSamlBundle\Onelogin;
 use Nbgrp\OneloginSamlBundle\Security;
 use Psr\Log\LoggerInterface;
+use Symfony\Component\HttpFoundation\RequestStack;
 use Symfony\Component\Security\Http\HttpUtils;
 
 return static function (ContainerConfigurator $container): void {
@@ -55,6 +56,11 @@ return static function (ContainerConfigurator $container): void {
             ->args([
                 service(Onelogin\AuthRegistryInterface::class),
                 service(Idp\IdpResolverInterface::class),
+            ])
+
+        ->set(Onelogin\AuthFactory::class)
+            ->args([
+                service(RequestStack::class),
             ])
 
         ->set(Onelogin\AuthRegistryInterface::class, Onelogin\AuthRegistry::class)
