@@ -62,7 +62,11 @@ final class NbgrpOneloginSamlExtensionTest extends TestCase
                     'assertionConsumerService' => [
                         'url' => 'http://example.com/saml/acs',
                     ],
+                    'singleLogoutService' => [
+                        'url' => '<request_scheme_and_host>/saml/logout',
+                    ],
                 ],
+                'baseurl' => '<request_scheme_and_host>/saml/',
             ],
         ], $container->getParameter('nbgrp_onelogin_saml.onelogin_settings'));
         self::assertSame('custom-idp', $container->getParameter('nbgrp_onelogin_saml.idp_parameter_name'));
