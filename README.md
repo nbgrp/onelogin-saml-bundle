@@ -12,8 +12,6 @@
 
 [![SymfonyInsight](https://insight.symfony.com/projects/ed7b9263-179c-442a-9f45-6877e4e6dbdb/small.svg)](https://insight.symfony.com/projects/ed7b9263-179c-442a-9f45-6877e4e6dbdb)
 
-[![ko-fi](https://ko-fi.com/img/githubbutton_sm.svg)](https://ko-fi.com/S6S073WSW)
-
 ## Overview
 
 [OneLogin SAML](https://github.com/onelogin/php-saml) Symfony Bundle.
