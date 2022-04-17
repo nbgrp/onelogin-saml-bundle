@@ -17,9 +17,10 @@ final class AuthFactory
     public function __invoke(array $settings): Auth
     {
         $request = $this->requestStack->getMainRequest();
-        if ($request) {
-            $settings = self::replaceSchemeAndHostPlaceholder($settings, $request->getSchemeAndHttpHost());
-        }
+        $settings = self::replaceSchemeAndHostPlaceholder(
+            $settings,
+            $request?->getSchemeAndHttpHost() ?? 'http://localhost',
+        );
 
         return new Auth($settings);
     }
