@@ -50,6 +50,6 @@
         }
     },
     "scripts": {
-        "nba": "docker run -it --rm -v $PWD:/app --workdir /app nbgrp/auditor:latest"
+        "nba": "docker run --rm -v $PWD:/app --workdir /app nbgrp/auditor:latest"
     }
 }
