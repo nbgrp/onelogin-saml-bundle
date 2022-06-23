@@ -5,7 +5,6 @@
     findUnusedPsalmSuppress="true"
     sealAllMethods="true"
     phpVersion="8.1"
-    autoloader="vendor/autoload.php"
     xmlns="https://getpsalm.org/schema/config"
 >
     <projectFiles>
