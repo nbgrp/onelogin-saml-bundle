@@ -1,5 +1,5 @@
 <?xml version="1.0"?>
-<ruleset name="SingleID CodeSniffer Standard">
+<ruleset name="Onelogin SAML Bundle CodeSniffer Standard">
 
     <config name="installed_paths" value="../../slevomat/coding-standard"/>
 
@@ -20,6 +20,7 @@
         <properties>
             <property name="groups" type="array">
                 <element value="uses" />
+                <element value="enum cases" />
                 <element value="public constants" />
                 <element value="protected constants" />
                 <element value="private constants" />
@@ -35,11 +36,15 @@
                 <element value="magic methods" />
                 <element value="public static abstract methods" />
                 <element value="public abstract methods" />
+                <element value="public static final methods" />
                 <element value="public static methods" />
+                <element value="public final methods" />
                 <element value="public methods" />
                 <element value="protected static abstract methods" />
                 <element value="protected abstract methods" />
+                <element value="protected static final methods" />
                 <element value="protected static methods" />
+                <element value="protected final methods" />
                 <element value="protected methods" />
                 <element value="private static methods" />
                 <element value="private methods" />
@@ -69,7 +74,17 @@
     </rule>
     <rule ref="SlevomatCodingStandard.Operators.DisallowEqualOperators" />
     <rule ref="SlevomatCodingStandard.PHP.DisallowDirectMagicInvokeCall" />
+    <rule ref="SlevomatCodingStandard.TypeHints.DeclareStrictTypes">
+        <properties>
+            <property name="declareOnFirstLine" value="true" />
+            <property name="linesCountAfterDeclare" value="0" />
+            <property name="spacesCountAroundEqualsSign" value="0" />
+        </properties>
+    </rule>
     <rule ref="SlevomatCodingStandard.TypeHints.ReturnTypeHint">
+        <properties>
+            <property name="enableIntersectionTypeHint" value="false" />
+        </properties>
         <exclude name="SlevomatCodingStandard.TypeHints.ReturnTypeHint.MissingTraversableTypeHintSpecification" />
     </rule>
     <rule ref="SlevomatCodingStandard.TypeHints.UnionTypeHintFormat">
@@ -84,6 +99,8 @@
 
     <!-- >>> Cleaning -->
     <rule ref="SlevomatCodingStandard.Exceptions.DeadCatch" />
+    <rule ref="SlevomatCodingStandard.Functions.UnusedInheritedVariablePassedToClosure" />
+    <rule ref="SlevomatCodingStandard.Functions.UselessParameterDefaultValue" />
     <rule ref="SlevomatCodingStandard.Namespaces.UnusedUses">
         <properties>
             <property name="searchAnnotations" value="true" />
@@ -91,15 +108,36 @@
     </rule>
     <rule ref="SlevomatCodingStandard.Namespaces.UseFromSameNamespace" />
     <rule ref="SlevomatCodingStandard.Namespaces.UselessAlias" />
+    <rule ref="SlevomatCodingStandard.PHP.OptimizedFunctionsWithoutUnpacking" />
+    <rule ref="SlevomatCodingStandard.PHP.RequireNowdoc" />
+    <rule ref="SlevomatCodingStandard.PHP.UselessSemicolon" />
     <rule ref="SlevomatCodingStandard.Variables.DisallowSuperGlobalVariable" />
+    <rule ref="SlevomatCodingStandard.Variables.DuplicateAssignmentToVariable" />
+    <rule ref="SlevomatCodingStandard.Variables.UnusedVariable" />
+    <rule ref="SlevomatCodingStandard.Variables.UselessVariable" />
     <!-- <<< Cleaning -->
 
     <!-- >>> Formatting -->
+    <rule ref="SlevomatCodingStandard.Arrays.MultiLineArrayEndBracketPlacement" />
+    <rule ref="SlevomatCodingStandard.Arrays.SingleLineArrayWhitespace">
+        <properties>
+            <property name="spacesAroundBrackets" value="0" />
+        </properties>
+    </rule>
     <rule ref="SlevomatCodingStandard.Arrays.TrailingArrayComma" />
     <rule ref="SlevomatCodingStandard.Classes.ClassConstantVisibility" />
     <rule ref="SlevomatCodingStandard.Classes.ClassMemberSpacing" />
     <rule ref="SlevomatCodingStandard.Classes.MethodSpacing" />
     <rule ref="SlevomatCodingStandard.Classes.ModernClassNameReference" />
+    <rule ref="SlevomatCodingStandard.Classes.PropertyDeclaration">
+        <properties>
+            <property name="modifiersOrder" type="array">
+                <element value="var" />
+                <element value="public, protected, private" />
+                <element value="static" />
+            </property>
+        </properties>
+    </rule>
     <rule ref="SlevomatCodingStandard.Commenting.DocCommentSpacing">
         <properties>
             <property name="annotationsGroups" type="array">
@@ -120,7 +158,7 @@
                 <element value="@psalm-assert, @phan-assert" />
                 <element value="@property, @psalm-property" />
                 <element value="@see" />
-                <element value="@suppress, @psalm-suppress, @phpstan-ignore-next-line, @phan-suppress-next-line, @phan-suppress-current-line" />
+                <element value="@suppress, @psalm-suppress, @phpstan-ignore-line, @phpstan-ignore-next-line, @phan-file-suppress, @phan-suppress-next-line, @phan-suppress-current-line" />
             </property>
         </properties>
     </rule>
@@ -137,9 +175,11 @@
     <rule ref="SlevomatCodingStandard.ControlStructures.DisallowYodaComparison" />
     <rule ref="SlevomatCodingStandard.ControlStructures.NewWithParentheses" />
     <rule ref="SlevomatCodingStandard.ControlStructures.RequireNullSafeObjectOperator" />
+    <rule ref="SlevomatCodingStandard.ControlStructures.RequireShortTernaryOperator" />
     <rule ref="SlevomatCodingStandard.ControlStructures.RequireTernaryOperator" />
     <rule ref="SlevomatCodingStandard.ControlStructures.UselessIfConditionWithReturn" />
     <rule ref="SlevomatCodingStandard.ControlStructures.UselessTernaryOperator" />
+    <rule ref="SlevomatCodingStandard.Functions.ArrowFunctionDeclaration" />
     <rule ref="SlevomatCodingStandard.Functions.RequireArrowFunction" />
     <rule ref="SlevomatCodingStandard.Functions.RequireTrailingCommaInCall" />
     <rule ref="SlevomatCodingStandard.Functions.RequireTrailingCommaInDeclaration" />
@@ -156,6 +196,12 @@
     </rule>
     <rule ref="SlevomatCodingStandard.PHP.ShortList" />
     <rule ref="SlevomatCodingStandard.PHP.TypeCast" />
+    <rule ref="SlevomatCodingStandard.TypeHints.DisallowArrayTypeHintSyntax">
+        <properties>
+            <property name="traversableTypeHints" value="true" />
+        </properties>
+    </rule>
+    <rule ref="SlevomatCodingStandard.TypeHints.NullableTypeForNullDefaultValue" />
     <rule ref="SlevomatCodingStandard.TypeHints.ReturnTypeHintSpacing" />
     <rule ref="SlevomatCodingStandard.TypeHints.ParameterTypeHintSpacing" />
     <!-- <<< Formatting -->
