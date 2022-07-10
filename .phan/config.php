@@ -84,6 +84,7 @@ return [
         APP_DIR.'/vendor/psr/log',
         APP_DIR.'/vendor/symfony/config',
         APP_DIR.'/vendor/symfony/dependency-injection',
+        APP_DIR.'/vendor/symfony/deprecation-contracts',
         APP_DIR.'/vendor/symfony/event-dispatcher',
         APP_DIR.'/vendor/symfony/event-dispatcher-contracts',
         APP_DIR.'/vendor/symfony/http-foundation',

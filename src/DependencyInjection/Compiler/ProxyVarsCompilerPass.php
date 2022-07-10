@@ -7,8 +7,13 @@ use OneLogin\Saml2\Utils;
 use Symfony\Component\DependencyInjection\Compiler\CompilerPassInterface;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 
+/** @psalm-suppress DeprecatedClass */
+trigger_deprecation('nbgrp/onelogin-saml-bundle', '1.2', 'The "%s" class is deprecated.', ProxyVarsCompilerPass::class);
+
 /**
  * Allows using `X-Forwarded-*` headers by OneLogin PHP SAML toolkit.
+ *
+ * @deprecated since nbgrp/onelogin-saml-bundle 1.2
  */
 class ProxyVarsCompilerPass implements CompilerPassInterface
 {

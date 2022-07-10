@@ -17,6 +17,9 @@ use Symfony\Component\HttpKernel\Bundle\Bundle;
  */
 class NbgrpOneloginSamlBundle extends Bundle
 {
+    /**
+     * @suppress PhanDeprecatedClass
+     */
     public function build(ContainerBuilder $container): void
     {
         parent::build($container);
@@ -27,6 +30,7 @@ class NbgrpOneloginSamlBundle extends Bundle
             $extension->addUserProviderFactory(new SamlUserProviderFactory());
         }
 
+        /** @psalm-suppress DeprecatedClass */
         $container
             ->addCompilerPass(new EntityManagerCompilerPass())
             ->addCompilerPass(new AuthRegistryCompilerPass())

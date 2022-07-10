@@ -83,6 +83,7 @@ return static function (ContainerConfigurator $container): void {
                 /* 7 */ null,  // user factory
                 /* 8 */ service(LoggerInterface::class)->nullOnInvalid(),
                 /* 9 */ param('nbgrp_onelogin_saml.idp_parameter_name'),
+                /* 10 */ param('nbgrp_onelogin_saml.use_proxy_vars'),
             ])
     ;
 };
