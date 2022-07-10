@@ -23,6 +23,7 @@ final class ProxyVarsCompilerPassTest extends TestCase
         $container = new ContainerBuilder();
         $container->setParameter('nbgrp_onelogin_saml.use_proxy_vars', $useVars);
 
+        /** @psalm-suppress DeprecatedClass */
         (new ProxyVarsCompilerPass())->process($container);
         self::assertSame($useVars, Utils::getProxyVars());
     }

@@ -17,6 +17,7 @@ use Nbgrp\OneloginSamlBundle\Security\User\SamlUserInterface;
 use Nbgrp\Tests\OneloginSamlBundle\TestUser;
 use OneLogin\Saml2\Auth;
 use OneLogin\Saml2\Settings;
+use OneLogin\Saml2\Utils;
 use PHPUnit\Framework\TestCase;
 use Psr\Log\LoggerInterface;
 use Symfony\Component\HttpFoundation\Request;
@@ -264,8 +265,10 @@ final class SamlAuthenticatorTest extends TestCase
         ?EventDispatcherInterface $eventDispatcher,
         array $options,
         ?string $lastRequestId,
+        bool $useProxyVars,
         string $expectedUserIdentifier,
         array $expectedSamlAttributes,
+        bool $expectedUseProxyVars,
     ): void {
         $request = Request::create('/');
         $session = new Session(new MockArraySessionStorage());
@@ -287,9 +290,12 @@ final class SamlAuthenticatorTest extends TestCase
             authRegistry: $authRegistry,
             options: $options,
             samlUserFactory: $samlUserFactory,
+            useProxyVars: $expectedUseProxyVars,
         );
 
+        self::assertFalse(Utils::getProxyVars());
         $passport = $authenticator->authenticate($request);
+        self::assertSame($expectedUseProxyVars, Utils::getProxyVars());
         self::assertSame($expectedUserIdentifier, $passport->getUser()->getUserIdentifier());
 
         /** @var SamlAttributesBadge $badge */
@@ -354,12 +360,14 @@ final class SamlAuthenticatorTest extends TestCase
                     'use_attribute_friendly_name' => false,
                 ],
                 'lastRequestId' => null,
+                'useProxyVars' => false,
                 'expectedUserIdentifier' => 'tester_id',
                 'expectedSamlAttributes' => [
                     'username' => 'tester',
                     'email' => 'tester@example.com',
                     SamlAuthenticator::SESSION_INDEX_ATTRIBUTE => 'session_index',
                 ],
+                'expectedUseProxyVars' => false,
             ];
         })();
 
@@ -433,12 +441,14 @@ final class SamlAuthenticatorTest extends TestCase
                     'identifier_attribute' => 'username',
                 ],
                 'lastRequestId' => null,
+                'useProxyVars' => false,
                 'expectedUserIdentifier' => 'tester_attribute',
                 'expectedSamlAttributes' => [
                     'username' => ['tester_attribute'],
                     'email' => 'tester@example.com',
                     SamlAuthenticator::SESSION_INDEX_ATTRIBUTE => 'session_index',
                 ],
+                'expectedUseProxyVars' => false,
             ];
         })();
 
@@ -506,12 +516,14 @@ final class SamlAuthenticatorTest extends TestCase
                     'identifier_attribute' => 'username',
                 ],
                 'lastRequestId' => 'requestID',
+                'useProxyVars' => true,
                 'expectedUserIdentifier' => 'tester_attribute',
                 'expectedSamlAttributes' => [
                     'username' => 'tester_attribute',
                     'email' => 'tester@example.com',
                     SamlAuthenticator::SESSION_INDEX_ATTRIBUTE => 'session_index',
                 ],
+                'expectedUseProxyVars' => true,
             ];
         })();
     }
@@ -771,6 +783,7 @@ final class SamlAuthenticatorTest extends TestCase
         ?SamlUserFactoryInterface $samlUserFactory = null,
         ?LoggerInterface $logger = null,
         string $idpParameterName = 'idp',
+        bool $useProxyVars = false,
     ): SamlAuthenticator {
         return new SamlAuthenticator(
             $httpUtils ?? $this->createStub(HttpUtils::class),
@@ -783,6 +796,7 @@ final class SamlAuthenticatorTest extends TestCase
             $samlUserFactory,
             $logger,
             $idpParameterName,
+            $useProxyVars,
         );
     }
 }
