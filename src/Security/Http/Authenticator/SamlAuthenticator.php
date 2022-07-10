@@ -13,6 +13,7 @@ use Nbgrp\OneloginSamlBundle\Security\Http\Authenticator\Token\SamlToken;
 use Nbgrp\OneloginSamlBundle\Security\User\SamlUserFactoryInterface;
 use Nbgrp\OneloginSamlBundle\Security\User\SamlUserInterface;
 use OneLogin\Saml2\Auth;
+use OneLogin\Saml2\Utils;
 use Psr\Log\LoggerInterface;
 use Symfony\Component\DependencyInjection\Attribute\AutoconfigureTag;
 use Symfony\Component\HttpFoundation\RedirectResponse;
@@ -52,6 +53,7 @@ class SamlAuthenticator implements AuthenticatorInterface, AuthenticationEntryPo
         private ?SamlUserFactoryInterface $userFactory,
         private ?LoggerInterface $logger,
         private string $idpParameterName,
+        private bool $useProxyVars,
     ) {}
 
     public function supports(Request $request): ?bool
@@ -82,6 +84,8 @@ class SamlAuthenticator implements AuthenticatorInterface, AuthenticationEntryPo
         }
 
         $oneLoginAuth = $this->getOneLoginAuth($request);
+        Utils::setProxyVars($this->useProxyVars);
+
         $this->processResponse($oneLoginAuth, $request->getSession());
 
         if ($oneLoginAuth->getErrors()) {
