@@ -5,7 +5,6 @@ namespace Nbgrp\OneloginSamlBundle;
 
 use Nbgrp\OneloginSamlBundle\DependencyInjection\Compiler\AuthRegistryCompilerPass;
 use Nbgrp\OneloginSamlBundle\DependencyInjection\Compiler\EntityManagerCompilerPass;
-use Nbgrp\OneloginSamlBundle\DependencyInjection\Compiler\ProxyVarsCompilerPass;
 use Nbgrp\OneloginSamlBundle\DependencyInjection\Security\Factory\SamlFactory;
 use Nbgrp\OneloginSamlBundle\DependencyInjection\Security\UserProvider\SamlUserProviderFactory;
 use Symfony\Bundle\SecurityBundle\DependencyInjection\SecurityExtension;
@@ -17,9 +16,6 @@ use Symfony\Component\HttpKernel\Bundle\Bundle;
  */
 class NbgrpOneloginSamlBundle extends Bundle
 {
-    /**
-     * @suppress PhanDeprecatedClass
-     */
     public function build(ContainerBuilder $container): void
     {
         parent::build($container);
@@ -30,11 +26,9 @@ class NbgrpOneloginSamlBundle extends Bundle
             $extension->addUserProviderFactory(new SamlUserProviderFactory());
         }
 
-        /** @psalm-suppress DeprecatedClass */
         $container
             ->addCompilerPass(new EntityManagerCompilerPass())
             ->addCompilerPass(new AuthRegistryCompilerPass())
-            ->addCompilerPass(new ProxyVarsCompilerPass())
         ;
     }
 }
