@@ -10,7 +10,7 @@ use OneLogin\Saml2\Auth;
  */
 interface AuthRegistryInterface
 {
-    public function addService(string $key, Auth $auth): AuthRegistry;
+    public function addService(string $key, Auth $auth): AuthRegistryInterface;
 
     public function hasService(string $key): bool;
 
