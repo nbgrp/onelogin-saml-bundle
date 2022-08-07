@@ -158,7 +158,7 @@
                 <element value="@psalm-assert, @phan-assert" />
                 <element value="@property, @psalm-property" />
                 <element value="@see" />
-                <element value="@suppress, @psalm-suppress, @phpstan-ignore-line, @phpstan-ignore-next-line, @phan-file-suppress, @phan-suppress-next-line, @phan-suppress-current-line" />
+                <element value="@suppress, @psalm-suppress, @phpstan-ignore-line, @phpstan-ignore-next-line, @phan-file-suppress, @phan-suppress-next-line, @phan-suppress-current-line, @SuppressWarnings" />
             </property>
         </properties>
     </rule>
@@ -172,6 +172,11 @@
     </rule>
     <rule ref="SlevomatCodingStandard.Commenting.InlineDocCommentDeclaration" />
     <rule ref="SlevomatCodingStandard.Commenting.UselessInheritDocComment" />
+    <rule ref="SlevomatCodingStandard.Complexity.Cognitive">
+        <properties>
+            <property name="maxComplexity" value="8" />
+        </properties>
+    </rule>
     <rule ref="SlevomatCodingStandard.ControlStructures.DisallowYodaComparison" />
     <rule ref="SlevomatCodingStandard.ControlStructures.NewWithParentheses" />
     <rule ref="SlevomatCodingStandard.ControlStructures.RequireNullSafeObjectOperator" />
