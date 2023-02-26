@@ -17,7 +17,7 @@ use Symfony\Component\HttpKernel\Exception\ServiceUnavailableHttpException;
 class Login
 {
     public function __construct(
-        private FirewallMap $firewallMap,
+        private readonly FirewallMap $firewallMap,
     ) {}
 
     public function __invoke(Request $request, Auth $auth): RedirectResponse

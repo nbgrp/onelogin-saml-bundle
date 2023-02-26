@@ -9,7 +9,7 @@ use Symfony\Contracts\EventDispatcher\Event;
 abstract class AbstractUserEvent extends Event
 {
     public function __construct(
-        private UserInterface $user,
+        private readonly UserInterface $user,
     ) {}
 
     public function getUser(): UserInterface

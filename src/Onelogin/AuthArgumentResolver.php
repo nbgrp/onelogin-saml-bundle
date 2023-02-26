@@ -18,8 +18,8 @@ use Symfony\Component\HttpKernel\Exception\ServiceUnavailableHttpException;
 final class AuthArgumentResolver implements ValueResolverInterface
 {
     public function __construct(
-        private AuthRegistryInterface $authRegistry,
-        private IdpResolverInterface $idpResolver,
+        private readonly AuthRegistryInterface $authRegistry,
+        private readonly IdpResolverInterface $idpResolver,
     ) {}
 
     public function resolve(Request $request, ArgumentMetadata $argument): iterable

@@ -12,8 +12,8 @@ final class SamlUserFactory implements SamlUserFactoryInterface
      * @param array<string, mixed>        $mapping
      */
     public function __construct(
-        private string $userClass,
-        private array $mapping,
+        private readonly string $userClass,
+        private readonly array $mapping,
     ) {}
 
     public function createUser(string $identifier, array $attributes): UserInterface
@@ -24,7 +24,6 @@ final class SamlUserFactory implements SamlUserFactoryInterface
         /** @psalm-suppress MixedAssignment */
         foreach ($this->mapping as $field => $attribute) {
             $property = $reflection->getProperty($field);
-            $property->setAccessible(true);
             $property->setValue(
                 $user,
                 \is_string($attribute) && str_starts_with($attribute, '$')

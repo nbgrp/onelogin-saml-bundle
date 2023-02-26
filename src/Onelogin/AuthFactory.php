@@ -11,7 +11,7 @@ final class AuthFactory
     public const SCHEME_AND_HOST_PLACEHOLDER = '<request_scheme_and_host>';
 
     public function __construct(
-        private RequestStack $requestStack,
+        private readonly RequestStack $requestStack,
     ) {}
 
     public function __invoke(array $settings): Auth

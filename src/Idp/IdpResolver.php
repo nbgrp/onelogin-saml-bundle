@@ -8,7 +8,7 @@ use Symfony\Component\HttpFoundation\Request;
 final class IdpResolver implements IdpResolverInterface
 {
     public function __construct(
-        private string $idpParameterName,
+        private readonly string $idpParameterName,
     ) {}
 
     public function resolve(Request $request): ?string
