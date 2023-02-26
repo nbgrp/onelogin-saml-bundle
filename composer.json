@@ -16,7 +16,7 @@
         }
     ],
     "require": {
-        "php": "^8",
+        "php": "^8.1",
         "onelogin/php-saml": "^4",
         "psr/log": "^1 || ^2 || ^3",
         "symfony/config": "^6",
@@ -36,8 +36,8 @@
         "symfony/phpunit-bridge": "^6"
     },
     "conflict": {
-        "symfony/http-kernel": ">=6.2",
-        "symfony/security-core": ">=6.2"
+        "symfony/http-kernel": "<6.2",
+        "symfony/security-core": "<6.2"
     },
     "autoload": {
         "psr-4": {

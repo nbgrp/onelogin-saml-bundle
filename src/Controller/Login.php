@@ -5,13 +5,13 @@ namespace Nbgrp\OneloginSamlBundle\Controller;
 
 use Nbgrp\OneloginSamlBundle\Security\Http\Authenticator\SamlAuthenticator;
 use OneLogin\Saml2\Auth;
+use Symfony\Bundle\SecurityBundle\Security;
 use Symfony\Bundle\SecurityBundle\Security\FirewallMap;
 use Symfony\Component\HttpFoundation\RedirectResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Session\SessionInterface;
 use Symfony\Component\HttpKernel\Attribute\AsController;
 use Symfony\Component\HttpKernel\Exception\ServiceUnavailableHttpException;
-use Symfony\Component\Security\Core\Security;
 
 #[AsController]
 class Login
