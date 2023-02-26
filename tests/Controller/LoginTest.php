@@ -8,13 +8,13 @@ use Nbgrp\OneloginSamlBundle\Security\Http\Authenticator\SamlAuthenticator;
 use OneLogin\Saml2\Auth;
 use OneLogin\Saml2\Settings;
 use PHPUnit\Framework\TestCase;
+use Symfony\Bundle\SecurityBundle\Security;
 use Symfony\Bundle\SecurityBundle\Security\FirewallConfig;
 use Symfony\Bundle\SecurityBundle\Security\FirewallMap;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Session\Session;
 use Symfony\Component\HttpFoundation\Session\Storage\MockArraySessionStorage;
 use Symfony\Component\HttpKernel\Exception\ServiceUnavailableHttpException;
-use Symfony\Component\Security\Core\Security;
 
 /**
  * @covers \Nbgrp\OneloginSamlBundle\Controller\Login

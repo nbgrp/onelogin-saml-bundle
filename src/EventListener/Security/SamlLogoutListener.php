@@ -18,8 +18,8 @@ use Symfony\Component\Security\Http\Event\LogoutEvent;
 final class SamlLogoutListener
 {
     public function __construct(
-        private AuthRegistryInterface $authRegistry,
-        private IdpResolverInterface $idpResolver,
+        private readonly AuthRegistryInterface $authRegistry,
+        private readonly IdpResolverInterface $idpResolver,
     ) {}
 
     #[AsEventListener(LogoutEvent::class)]

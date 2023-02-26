@@ -7,7 +7,7 @@ jobs:
     name: Audit
     strategy:
       matrix:
-        php-version: [ '8.0', '8.1', '8.2' ]
+        php-version: [ '8.1', '8.2' ]
       fail-fast: false
     runs-on: ubuntu-latest
     steps:
@@ -25,12 +25,12 @@ jobs:
 
       - name: Get composer cache directory
         id: composer-cache
-        run: echo "::set-output name=dir::$(composer config cache-files-dir)"
+        run: echo "DIR=$(composer config cache-files-dir)" >> $GITHUB_OUTPUT
 
       - name: Cache dependencies
         uses: actions/cache@v3
         with:
-          path: ${{ steps.composer-cache.outputs.dir }}
+          path: ${{ steps.composer-cache.outputs.DIR }}
           key: ${{ runner.os }}-composer-${{ hashFiles('**/composer.json') }}
           restore-keys: ${{ runner.os }}-composer-
 

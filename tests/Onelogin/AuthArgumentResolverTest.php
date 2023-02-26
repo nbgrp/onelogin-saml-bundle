@@ -4,10 +4,8 @@
 namespace Nbgrp\Tests\OneloginSamlBundle\Onelogin;
 
 use Nbgrp\OneloginSamlBundle\Idp\IdpResolver;
-use Nbgrp\OneloginSamlBundle\Idp\IdpResolverInterface;
 use Nbgrp\OneloginSamlBundle\Onelogin\AuthArgumentResolver;
 use Nbgrp\OneloginSamlBundle\Onelogin\AuthRegistry;
-use Nbgrp\OneloginSamlBundle\Onelogin\AuthRegistryInterface;
 use OneLogin\Saml2\Auth;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\HttpFoundation\Request;
@@ -24,15 +22,6 @@ use Symfony\Component\HttpKernel\Exception\ServiceUnavailableHttpException;
  */
 final class AuthArgumentResolverTest extends TestCase
 {
-    public function testSupports(): void
-    {
-        $resolver = new AuthArgumentResolver($this->createStub(AuthRegistryInterface::class), $this->createStub(IdpResolverInterface::class));
-        $request = $this->createStub(Request::class);
-
-        self::assertTrue($resolver->supports($request, new ArgumentMetadata('foo', Auth::class, false, false, null)));
-        self::assertFalse($resolver->supports($request, new ArgumentMetadata('foo', 'string', false, false, null)));
-    }
-
     public function testResolve(): void
     {
         $authRegistry = new AuthRegistry();

@@ -11,7 +11,7 @@ use Symfony\Component\Security\Http\Authenticator\Passport\Badge\BadgeInterface;
 class SamlAttributesBadge implements BadgeInterface
 {
     public function __construct(
-        private array $attributes,
+        private readonly array $attributes,
     ) {}
 
     public function getAttributes(): array

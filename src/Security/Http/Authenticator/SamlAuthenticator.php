@@ -43,17 +43,17 @@ class SamlAuthenticator implements AuthenticatorInterface, AuthenticationEntryPo
     public const LAST_REQUEST_ID = '_saml_last_request_id';
 
     public function __construct(
-        private HttpUtils $httpUtils,
-        private UserProviderInterface $userProvider,
-        private IdpResolverInterface $idpResolver,
-        private AuthRegistryInterface $authRegistry,
-        private AuthenticationSuccessHandlerInterface $successHandler,
-        private AuthenticationFailureHandlerInterface $failureHandler,
-        private array $options,
-        private ?SamlUserFactoryInterface $userFactory,
-        private ?LoggerInterface $logger,
-        private string $idpParameterName,
-        private bool $useProxyVars,
+        private readonly HttpUtils $httpUtils,
+        private readonly UserProviderInterface $userProvider,
+        private readonly IdpResolverInterface $idpResolver,
+        private readonly AuthRegistryInterface $authRegistry,
+        private readonly AuthenticationSuccessHandlerInterface $successHandler,
+        private readonly AuthenticationFailureHandlerInterface $failureHandler,
+        private readonly array $options,
+        private readonly ?SamlUserFactoryInterface $userFactory,
+        private readonly ?LoggerInterface $logger,
+        private readonly string $idpParameterName,
+        private readonly bool $useProxyVars,
     ) {}
 
     public function supports(Request $request): ?bool
