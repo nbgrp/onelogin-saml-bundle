@@ -10,8 +10,10 @@ use Nbgrp\OneloginSamlBundle\Security\Http\Authentication\SamlAuthenticationSucc
 use Nbgrp\OneloginSamlBundle\Security\Http\Authenticator\SamlAuthenticator;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\Config\Definition\Builder\ArrayNodeDefinition;
+use Symfony\Component\DependencyInjection\ChildDefinition;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\DependencyInjection\Definition;
+use Symfony\Component\DependencyInjection\Reference;
 
 /**
  * @covers \Nbgrp\OneloginSamlBundle\DependencyInjection\Security\Factory\SamlFactory
@@ -78,16 +80,20 @@ final class SamlFactoryTest extends TestCase
 
         $authenticatorDefinition = $container->getDefinition('security.authenticator.saml.foo');
 
-        /** @var \Symfony\Component\DependencyInjection\Reference $userProviderReference */
+        /** @var Reference $userProviderReference */
         $userProviderReference = $authenticatorDefinition->getArgument(1);
         self::assertSame('user_provider', (string) $userProviderReference);
 
-        /** @var \Symfony\Component\DependencyInjection\Reference $successHandlerReference */
+        /** @var Reference $successHandlerReference */
         $successHandlerReference = $authenticatorDefinition->getArgument(4);
         $successHandlerDefinition = $container->getDefinition((string) $successHandlerReference);
-        /** @var \Symfony\Component\DependencyInjection\Reference $samlSuccessHandlerReference */
+        /** @var Reference|ChildDefinition|mixed $samlSuccessHandlerReference */
         $samlSuccessHandlerReference = $successHandlerDefinition->getArgument(0);
-        self::assertSame(SamlAuthenticationSuccessHandler::class, (string) $samlSuccessHandlerReference);
+        if ($samlSuccessHandlerReference instanceof Reference) {
+            self::assertSame(SamlAuthenticationSuccessHandler::class, (string) $samlSuccessHandlerReference);
+        } elseif ($samlSuccessHandlerReference instanceof ChildDefinition) {
+            self::assertSame(SamlAuthenticationSuccessHandler::class, $samlSuccessHandlerReference->getParent());
+        }
 
         /** @var array $options */
         $options = $authenticatorDefinition->getArgument(6);
@@ -97,17 +103,17 @@ final class SamlFactoryTest extends TestCase
             'success_handler' => SamlAuthenticationSuccessHandler::class,
         ], $options);
 
-        /** @var \Symfony\Component\DependencyInjection\Reference $userFactoryReference */
+        /** @var Reference $userFactoryReference */
         $userFactoryReference = $authenticatorDefinition->getArgument(7);
         self::assertSame('saml_user_factory', (string) $userFactoryReference);
 
-        /** @var \Symfony\Component\DependencyInjection\ChildDefinition $userCreatedListenerDefinition */
+        /** @var ChildDefinition $userCreatedListenerDefinition */
         $userCreatedListenerDefinition = $container->getDefinition('nbgrp_onelogin_saml.user_created_listener.foo');
         self::assertSame(UserCreatedListener::class, $userCreatedListenerDefinition->getParent());
         self::assertTrue($userCreatedListenerDefinition->getArgument(1));
         self::assertTrue($userCreatedListenerDefinition->hasTag('nbgrp.saml_user_listener'));
 
-        /** @var \Symfony\Component\DependencyInjection\ChildDefinition $userModifiedListenerDefinition */
+        /** @var ChildDefinition $userModifiedListenerDefinition */
         $userModifiedListenerDefinition = $container->getDefinition('nbgrp_onelogin_saml.user_modified_listener.foo');
         self::assertSame(UserModifiedListener::class, $userModifiedListenerDefinition->getParent());
         self::assertTrue($userModifiedListenerDefinition->getArgument(1));
