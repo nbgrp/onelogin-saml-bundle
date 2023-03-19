@@ -18,7 +18,7 @@ return (new PhpCsFixer\Config())
         '@PER' => true,
         '@PhpCsFixer' => true,
         '@Symfony' => true,
-        '@PHP80Migration' => true,
+        '@PHP81Migration' => true,
 
         // risky presets
         '@PER:risky' => true,
