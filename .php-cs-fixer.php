@@ -15,12 +15,13 @@ return (new PhpCsFixer\Config())
     ->setRiskyAllowed(true)
     ->setRules([
         // base presets
-        '@PSR12' => true,
+        '@PER' => true,
         '@PhpCsFixer' => true,
         '@Symfony' => true,
         '@PHP80Migration' => true,
 
         // risky presets
+        '@PER:risky' => true,
         '@PhpCsFixer:risky' => true,
         '@Symfony:risky' => true,
         '@PHP80Migration:risky' => true,
@@ -33,7 +34,7 @@ return (new PhpCsFixer\Config())
         ],
         'blank_line_after_opening_tag' => false,
         'blank_line_before_statement' => [
-            'statements' => ['case', 'default', 'declare', 'return', 'throw', 'try'],
+            'statements' => ['case', 'default', 'return', 'throw', 'try'],
         ],
         'braces' => false,
         'comment_to_phpdoc' => [
@@ -83,11 +84,7 @@ return (new PhpCsFixer\Config())
             'null_adjustment' => 'always_last',
             'sort_algorithm' => 'none',
         ],
-        'single_line_comment_style' => [
-            'comment_types' => [
-                'asterisk',
-            ],
-        ],
+        'single_line_comment_style' => true,
         'single_line_throw' => false,
         'yoda_style' => false,
 
