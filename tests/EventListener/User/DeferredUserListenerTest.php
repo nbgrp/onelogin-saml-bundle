@@ -33,7 +33,7 @@ final class DeferredUserListenerTest extends TestCase
             ->method('dispatch')
         ;
 
-        (new DeferredUserListener())->dispatchDeferredEvent($event, '', $eventDispatcher);
+        (new DeferredUserListener())($event, '', $eventDispatcher);
     }
 
     public function testBadgeWithoutEvent(): void
@@ -49,7 +49,7 @@ final class DeferredUserListenerTest extends TestCase
             ->method('dispatch')
         ;
 
-        (new DeferredUserListener())->dispatchDeferredEvent($event, '', $eventDispatcher);
+        (new DeferredUserListener())($event, '', $eventDispatcher);
     }
 
     public function testSuccessfulEventDispatching(): void
@@ -71,6 +71,6 @@ final class DeferredUserListenerTest extends TestCase
             ->with($deferredEvent)
         ;
 
-        (new DeferredUserListener())->dispatchDeferredEvent($event, '', $eventDispatcher);
+        (new DeferredUserListener())($event, '', $eventDispatcher);
     }
 }
