@@ -8,10 +8,10 @@ use Symfony\Component\EventDispatcher\Attribute\AsEventListener;
 use Symfony\Component\Security\Http\Event\CheckPassportEvent;
 use Symfony\Contracts\EventDispatcher\EventDispatcherInterface;
 
-#[AsEventListener]
 final class DeferredUserListener
 {
-    public function __invoke(CheckPassportEvent $event, string $eventName, EventDispatcherInterface $eventDispatcher): void
+    #[AsEventListener(CheckPassportEvent::class)]
+    public function dispatchDeferredEvent(CheckPassportEvent $event, string $eventName, EventDispatcherInterface $eventDispatcher): void
     {
         $badge = $event->getPassport()->getBadge(DeferredEventBadge::class);
         if (!$badge instanceof DeferredEventBadge) {
