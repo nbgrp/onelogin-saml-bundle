@@ -17,7 +17,8 @@
 [OneLogin SAML](https://github.com/onelogin/php-saml) Symfony Bundle.
 
 > This bundle depends on Symfony 6 and newer. <br>
-> For older Symfony versions you can use [hslavich/oneloginsaml-bundle](https://github.com/hslavich/OneloginSamlBundle)
+> For older Symfony versions you can
+> use [hslavich/oneloginsaml-bundle](https://github.com/hslavich/OneloginSamlBundle)
 > which this bundle based on.
 
 ## Installation
@@ -395,4 +396,27 @@ and `Nbgrp\OneloginSamlBundle\EventListener\User\UserModifiedListener` that can 
 need to override the default behavior.
 
 Also, you can make your own listeners for `Nbgrp\OneloginSamlBundle\Event\UserCreatedEvent`
-and `Nbgrp\OneloginSamlBundle\Event\UserModifiedEvent` events.
+and `Nbgrp\OneloginSamlBundle\Event\UserModifiedEvent` events:
+
+``` php
+<?php
+
+namespace App\Security;
+
+use Nbgrp\OneloginSamlBundle\Event\UserCreatedEvent;
+use Symfony\Component\EventDispatcher\Attribute\AsEventListener;
+
+#[AsEventListener(event: UserCreatedEvent::class, dispatcher: 'security.event_dispatcher.main')]
+class UserCreatedListener
+{
+    public function __invoke(UserCreatedEvent $event): void
+    {
+        // ...
+    }
+}
+
+```
+
+**Important:** you must specify the `dispatcher` option corresponding the firewall which will
+trigger the event (`main` in the example above). Read more
+about [Security Events](https://symfony.com/doc/current/security.html#security-events).
