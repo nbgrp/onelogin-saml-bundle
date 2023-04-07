@@ -18,7 +18,7 @@ class AuthRegistryCompilerPass implements CompilerPassInterface
 {
     public function process(ContainerBuilder $container): void
     {
-        $authRegistry = $container->getDefinition(AuthRegistryInterface::class);
+        $authRegistry = $container->findDefinition(AuthRegistryInterface::class);
 
         $oneloginSettings = $container->getParameter('nbgrp_onelogin_saml.onelogin_settings');
         if (!\is_array($oneloginSettings)) {
