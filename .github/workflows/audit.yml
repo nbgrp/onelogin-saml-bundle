@@ -12,13 +12,13 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Checkout (Push)
-        uses: actions/checkout@v3
+        uses: actions/checkout@v4
         if: github.event_name == 'push'
         with:
           fetch-depth: 0
 
       - name: Checkout (PR)
-        uses: actions/checkout@v3
+        uses: actions/checkout@v4
         if: github.event_name == 'pull_request'
         with:
           ref: ${{ github.event.pull_request.head.ref }}
