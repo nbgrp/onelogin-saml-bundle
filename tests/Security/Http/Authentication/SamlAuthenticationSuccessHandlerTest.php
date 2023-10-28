@@ -32,6 +32,7 @@ final class SamlAuthenticationSuccessHandlerTest extends TestCase
         $handler = new SamlAuthenticationSuccessHandler(new HttpUtils($urlGenerator), $options);
         $response = $handler->onAuthenticationSuccess($request, $token);
 
+        self::assertNotNull($response);
         self::assertSame(Response::HTTP_FOUND, $response->getStatusCode());
         self::assertSame($expectedLocation, $response->headers->get('Location'));
     }

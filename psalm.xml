@@ -15,15 +15,6 @@
         </ignoreFiles>
     </projectFiles>
 
-    <issueHandlers>
-        <!-- PHPUnit -->
-        <PropertyNotSetInConstructor>
-            <errorLevel type="suppress">
-                <directory name="tests" />
-            </errorLevel>
-        </PropertyNotSetInConstructor>
-    </issueHandlers>
-
     <plugins>
         <pluginClass class="Psalm\SymfonyPsalmPlugin\Plugin" />
     </plugins>

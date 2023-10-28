@@ -52,6 +52,7 @@ class SamlFactory extends AbstractFactory
         ;
 
         if (!empty($config['user_factory'])) {
+            /** @phpstan-ignore-next-line */
             $authenticator->replaceArgument(7, new Reference((string) $config['user_factory']));
         }
 
