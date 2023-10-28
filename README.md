@@ -308,7 +308,7 @@ services:
 > Mapping items with '$' at the beginning of values references to SAML attribute value. <br>
 > Values with '[]' at the end will be presented as arrays (even if they originally are scalars).
 
-Then add created service id as `user_factory` parameter into your firewall settings in
+Then add the created service id as the `user_factory` parameter into your firewall settings in
 `security.yaml`:
 
 ``` yml
@@ -387,10 +387,10 @@ security:
                 persist_user: true
 ```
 
-To use non-default entity manager specify it name by `nbgrp_onelogin_saml.entity_manager_name`
+To use non-default entity manager, specify its name in the `nbgrp_onelogin_saml.entity_manager_name`
 bundle configuration parameter.
 
-User persistence is performing by event
+User persistence is performing by the event
 listeners `Nbgrp\OneloginSamlBundle\EventListener\User\UserCreatedListener`
 and `Nbgrp\OneloginSamlBundle\EventListener\User\UserModifiedListener` that can be decorated if you
 need to override the default behavior.
