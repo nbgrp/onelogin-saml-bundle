@@ -21,7 +21,7 @@ use Symfony\Component\Security\Http\HttpUtils;
 final class SamlAuthenticationSuccessHandlerTest extends TestCase
 {
     /**
-     * @dataProvider locationProvider
+     * @dataProvider provideHandlerCases
      */
     public function testHandler(array $options, Request $request, string $expectedLocation): void
     {
@@ -36,7 +36,7 @@ final class SamlAuthenticationSuccessHandlerTest extends TestCase
         self::assertSame($expectedLocation, $response->headers->get('Location'));
     }
 
-    public function locationProvider(): \Generator
+    public function provideHandlerCases(): iterable
     {
         yield 'Always use default target path' => [
             'options' => [

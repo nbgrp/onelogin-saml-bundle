@@ -20,14 +20,14 @@ final class ConfigurationTest extends TestCase
     private Processor $processor;
 
     /**
-     * @dataProvider validConfigProvider
+     * @dataProvider provideValidConfigCases
      */
     public function testValidConfig(array $config, array $expected): void
     {
         self::assertSame($expected, $this->processor->processConfiguration(new Configuration(), [$config]));
     }
 
-    public function validConfigProvider(): \Generator
+    public function provideValidConfigCases(): iterable
     {
         yield 'Simple configuration' => [
             'config' => [
@@ -302,7 +302,7 @@ final class ConfigurationTest extends TestCase
     }
 
     /**
-     * @dataProvider invalidOneLoginSettingsProvider
+     * @dataProvider provideConfigWithInvalidOneLoginSettingsExceptionCases
      */
     public function testConfigWithInvalidOneLoginSettingsException(array $config, string $expectedMessage): void
     {
@@ -311,7 +311,7 @@ final class ConfigurationTest extends TestCase
         $this->processor->processConfiguration(new Configuration(), [$config]);
     }
 
-    public function invalidOneLoginSettingsProvider(): \Generator
+    public function provideConfigWithInvalidOneLoginSettingsExceptionCases(): iterable
     {
         yield 'Empty idp OneLogin settings' => [
             'config' => [

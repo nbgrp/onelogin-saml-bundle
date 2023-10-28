@@ -18,7 +18,7 @@ use Symfony\Component\DependencyInjection\ContainerBuilder;
 final class ProxyVarsCompilerPassTest extends TestCase
 {
     /**
-     * @dataProvider processProvider
+     * @dataProvider provideProcessCases
      */
     public function testProcess(bool $useVars): void
     {
@@ -30,7 +30,7 @@ final class ProxyVarsCompilerPassTest extends TestCase
         self::assertSame($useVars, Utils::getProxyVars());
     }
 
-    public function processProvider(): \Generator
+    public function provideProcessCases(): iterable
     {
         yield 'Use vars' => [
             'useVars' => true,
