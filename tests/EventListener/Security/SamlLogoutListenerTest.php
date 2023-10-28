@@ -26,7 +26,7 @@ use Symfony\Component\Security\Http\Event\LogoutEvent;
 final class SamlLogoutListenerTest extends TestCase
 {
     /**
-     * @dataProvider successLogoutProvider
+     * @dataProvider provideCases
      */
     public function test(AuthRegistry $authRegistry, IdpResolverInterface $ipdResolver, Request $request, ?TokenInterface $token): void
     {
@@ -44,7 +44,7 @@ final class SamlLogoutListenerTest extends TestCase
         (new SamlLogoutListener($authRegistry, $ipdResolver))->processSingleLogout($event);
     }
 
-    public function successLogoutProvider(): \Generator
+    public function provideCases(): iterable
     {
         yield 'No Auth service' => [
             'authRegistry' => (function (): AuthRegistry {

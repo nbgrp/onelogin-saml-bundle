@@ -19,14 +19,14 @@ final class IdpResolverTest extends TestCase
     private IdpResolver $resolver;
 
     /**
-     * @dataProvider resolveProvider
+     * @dataProvider provideResolveCases
      */
     public function testResolve(Request $request, ?string $expected): void
     {
         self::assertSame($expected, $this->resolver->resolve($request));
     }
 
-    public function resolveProvider(): \Generator
+    public function provideResolveCases(): iterable
     {
         yield 'Request with ipd in query' => [
             'request' => new Request(['idp' => 'query-idp']),
