@@ -17,7 +17,7 @@ use PHPUnit\Framework\TestCase;
 final class SamlTokenTest extends TestCase
 {
     /**
-     * @dataProvider attributesProvider
+     * @dataProvider provideTokenCases
      */
     public function testToken(array $attributes): void
     {
@@ -29,7 +29,7 @@ final class SamlTokenTest extends TestCase
         self::assertSame($token->getAttributes(), $attributes);
     }
 
-    public function attributesProvider(): \Generator
+    public function provideTokenCases(): iterable
     {
         yield 'Empty attributes' => [
             'attributes' => [],

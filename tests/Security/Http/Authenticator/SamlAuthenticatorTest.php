@@ -48,7 +48,7 @@ use Symfony\Contracts\EventDispatcher\EventDispatcherInterface;
 final class SamlAuthenticatorTest extends TestCase
 {
     /**
-     * @dataProvider supportsProvider
+     * @dataProvider provideSupportsCases
      */
     public function testSupports(Request $request, bool $expectedSupports): void
     {
@@ -60,7 +60,7 @@ final class SamlAuthenticatorTest extends TestCase
         self::assertSame($expectedSupports, $authenticator->supports($request));
     }
 
-    public function supportsProvider(): \Generator
+    public function provideSupportsCases(): iterable
     {
         yield 'GET request' => [
             'request' => Request::create('/'),
@@ -79,7 +79,7 @@ final class SamlAuthenticatorTest extends TestCase
     }
 
     /**
-     * @dataProvider startProvider
+     * @dataProvider provideStartCases
      */
     public function testStart(Request $request, string $idpParameterName, string $expectedLocation): void
     {
@@ -95,7 +95,7 @@ final class SamlAuthenticatorTest extends TestCase
         self::assertSame($expectedLocation, $response->headers->get('Location'));
     }
 
-    public function startProvider(): \Generator
+    public function provideStartCases(): iterable
     {
         yield 'Without idp' => [
             'request' => Request::create('/'),
@@ -111,7 +111,7 @@ final class SamlAuthenticatorTest extends TestCase
     }
 
     /**
-     * @dataProvider authenticateSessionExceptionProvider
+     * @dataProvider provideAuthenticateSessionExceptionCases
      */
     public function testAuthenticateSessionException(Request $request, string $expectedMessage): void
     {
@@ -125,7 +125,7 @@ final class SamlAuthenticatorTest extends TestCase
         $authenticator->authenticate($request);
     }
 
-    public function authenticateSessionExceptionProvider(): \Generator
+    public function provideAuthenticateSessionExceptionCases(): iterable
     {
         yield 'No session' => [
             'request' => Request::create('/'),
@@ -141,7 +141,7 @@ final class SamlAuthenticatorTest extends TestCase
     }
 
     /**
-     * @dataProvider authenticateOneLoginErrorsExceptionProvider
+     * @dataProvider provideAuthenticateOneLoginErrorsExceptionCases
      */
     public function testAuthenticateOneLoginErrorsException(
         IdpResolverInterface $idpResolver,
@@ -170,7 +170,7 @@ final class SamlAuthenticatorTest extends TestCase
         $authenticator->authenticate($request);
     }
 
-    public function authenticateOneLoginErrorsExceptionProvider(): \Generator
+    public function provideAuthenticateOneLoginErrorsExceptionCases(): iterable
     {
         yield 'Default Auth service + OneLogin auth error' => (function (): array {
             $idpResolver = $this->createConfiguredMock(IdpResolverInterface::class, [
@@ -258,7 +258,7 @@ final class SamlAuthenticatorTest extends TestCase
     }
 
     /**
-     * @dataProvider successAuthenticateProvider
+     * @dataProvider provideSuccessAuthenticateCases
      */
     public function testSuccessAuthenticate(
         Auth $auth,
@@ -319,7 +319,7 @@ final class SamlAuthenticatorTest extends TestCase
         $eventDispatcher->dispatch($deferredEvent);
     }
 
-    public function successAuthenticateProvider(): \Generator
+    public function provideSuccessAuthenticateCases(): iterable
     {
         yield 'Not attribute friendly name + user identifier from OneLogin auth' => (function (): array {
             $settingsMock = $this->createMock(Settings::class);
@@ -531,7 +531,7 @@ final class SamlAuthenticatorTest extends TestCase
     }
 
     /**
-     * @dataProvider authenticateExceptionProvider
+     * @dataProvider provideAuthenticateExceptionCases
      *
      * @param class-string<\Throwable> $expectedException
      */
@@ -569,7 +569,7 @@ final class SamlAuthenticatorTest extends TestCase
         $authenticator->authenticate($request)->getUser();
     }
 
-    public function authenticateExceptionProvider(): \Generator
+    public function provideAuthenticateExceptionCases(): iterable
     {
         yield 'SAML attributes without identifier attribute' => (function (): array {
             $settingsMock = $this->createMock(Settings::class);

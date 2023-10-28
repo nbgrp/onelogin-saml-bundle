@@ -40,7 +40,7 @@ final class UserListenersTest extends TestCase
         (new UserModifiedListener($entityManager, $needPersist))(new UserModifiedEvent($user));
     }
 
-    public function userListenerProvider(): \Generator
+    public function userListenerProvider(): iterable
     {
         yield 'needPersist false' => (function (): array {
             $entityManager = $this->createMock(EntityManagerInterface::class);
