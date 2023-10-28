@@ -16,7 +16,7 @@ use PHPUnit\Framework\TestCase;
 final class SamlAttributesBadgeTest extends TestCase
 {
     /**
-     * @dataProvider attributesProvider
+     * @dataProvider provideBadgeCases
      */
     public function testBadge(array $attributes): void
     {
@@ -26,7 +26,7 @@ final class SamlAttributesBadgeTest extends TestCase
         self::assertTrue($badge->isResolved());
     }
 
-    public function attributesProvider(): \Generator
+    public function provideBadgeCases(): iterable
     {
         yield 'Empty attributes' => [
             'attributes' => [],

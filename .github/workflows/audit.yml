@@ -54,13 +54,13 @@ jobs:
           echo "::endgroup::"
 
       - name: Auditor
-        uses: docker://nbgrp/auditor:latest
+        uses: docker://nbgrp/auditor:0.20.0
 
       - name: Tests
         run: vendor/bin/simple-phpunit
 
       - name: Codecov
-        uses: codecov/codecov-action@v4
+        uses: codecov/codecov-action@v3
         with:
           token: ${{ secrets.CODECOV_TOKEN }}
           files: ./clover.xml

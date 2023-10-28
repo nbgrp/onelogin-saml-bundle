@@ -106,7 +106,7 @@ final class LoginTest extends TestCase
     }
 
     /**
-     * @dataProvider errorExceptionProvider
+     * @dataProvider provideErrorExceptionCases
      */
     public function testErrorException(Request $request, string $expectedMessage): void
     {
@@ -125,7 +125,7 @@ final class LoginTest extends TestCase
         $controller($request, $auth);
     }
 
-    public function errorExceptionProvider(): \Generator
+    public function provideErrorExceptionCases(): iterable
     {
         yield 'From attributes' => [
             'request' => (static function () {

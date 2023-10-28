@@ -4,22 +4,16 @@
     strictBinaryOperands="true"
     findUnusedPsalmSuppress="true"
     sealAllMethods="true"
-    phpVersion="8.1"
     xmlns="https://getpsalm.org/schema/config"
 >
     <projectFiles>
         <directory name="src" />
-        <directory name="tests" />
         <ignoreFiles>
             <file name="src/DependencyInjection/Configuration.php" />
             <file name="src/DependencyInjection/Security/UserProvider/SamlUserProviderFactory.php" />
             <file name="vendor/symfony/security-http/Authentication/DefaultAuthenticationSuccessHandler.php" />
         </ignoreFiles>
     </projectFiles>
-
-    <extraFiles>
-        <directory name="vendor" />
-    </extraFiles>
 
     <issueHandlers>
         <!-- PHPUnit -->

@@ -29,9 +29,7 @@ final class TestUser implements UserInterface
         return $this->roles;
     }
 
-    public function eraseCredentials(): void
-    {
-    }
+    public function eraseCredentials(): void {}
 
     public function setEmail(string $email): self
     {
