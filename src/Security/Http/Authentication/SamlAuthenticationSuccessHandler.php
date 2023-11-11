@@ -7,7 +7,6 @@ namespace Nbgrp\OneloginSamlBundle\Security\Http\Authentication;
 
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\Security\Http\Authentication\DefaultAuthenticationSuccessHandler;
-use Symfony\Component\Security\Http\HttpUtils;
 
 /**
  * Returns value of RelayState request parameter (GET or POST) as target url
@@ -17,7 +16,6 @@ class SamlAuthenticationSuccessHandler extends DefaultAuthenticationSuccessHandl
 {
     public const RELAY_STATE = 'RelayState';
 
-    /** @psalm-suppress MixedArrayAccess */
     protected function determineTargetUrl(Request $request): string
     {
         if ($this->options['always_use_default_target_path']) {
@@ -26,7 +24,7 @@ class SamlAuthenticationSuccessHandler extends DefaultAuthenticationSuccessHandl
 
         /** @psalm-suppress InvalidArgument */
         $relayState = $request->query->get(self::RELAY_STATE, $request->request->get(self::RELAY_STATE));
-        if ($relayState !== null && $this->httpUtils instanceof HttpUtils) {
+        if ($relayState !== null) {
             /** @psalm-suppress RedundantCastGivenDocblockType */
             $relayState = (string) $relayState;
             if ($relayState !== $this->httpUtils->generateUri($request, (string) $this->options['login_path'])) {

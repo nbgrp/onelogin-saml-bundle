@@ -37,7 +37,6 @@ final class SamlFactoryTest extends TestCase
             'success_handler' => SamlAuthenticationSuccessHandler::class,
             'check_path' => '/login_check',
             'use_forward' => false,
-            'require_previous_session' => false,
             'login_path' => '/login',
             'identifier_attribute' => null,
             'use_attribute_friendly_name' => false,
