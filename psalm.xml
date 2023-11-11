@@ -4,6 +4,8 @@
     strictBinaryOperands="true"
     findUnusedPsalmSuppress="true"
     sealAllMethods="true"
+    findUnusedBaselineEntry="false"
+    findUnusedCode="false"
     xmlns="https://getpsalm.org/schema/config"
 >
     <projectFiles>

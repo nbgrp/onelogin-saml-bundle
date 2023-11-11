@@ -10,13 +10,13 @@ use Nbgrp\OneloginSamlBundle\Security\Http\Authenticator\SamlAuthenticator;
 use OneLogin\Saml2\Auth;
 use OneLogin\Saml2\Settings;
 use PHPUnit\Framework\TestCase;
-use Symfony\Bundle\SecurityBundle\Security;
 use Symfony\Bundle\SecurityBundle\Security\FirewallConfig;
 use Symfony\Bundle\SecurityBundle\Security\FirewallMap;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Session\Session;
 use Symfony\Component\HttpFoundation\Session\Storage\MockArraySessionStorage;
 use Symfony\Component\HttpKernel\Exception\ServiceUnavailableHttpException;
+use Symfony\Component\Security\Http\SecurityRequestAttributes;
 
 /**
  * @covers \Nbgrp\OneloginSamlBundle\Controller\Login
@@ -130,7 +130,7 @@ final class LoginTest extends TestCase
         yield 'From attributes' => [
             'request' => (static function () {
                 $request = Request::create('/login');
-                $request->attributes->set(Security::AUTHENTICATION_ERROR, new \Exception('Error from attributes'));
+                $request->attributes->set(SecurityRequestAttributes::AUTHENTICATION_ERROR, new \Exception('Error from attributes'));
 
                 return $request;
             })(),
@@ -141,7 +141,7 @@ final class LoginTest extends TestCase
             'request' => (static function () {
                 $request = Request::create('/login');
                 $session = new Session(new MockArraySessionStorage());
-                $session->set(Security::AUTHENTICATION_ERROR, new \Exception('Error from session'));
+                $session->set(SecurityRequestAttributes::AUTHENTICATION_ERROR, new \Exception('Error from session'));
                 $request->setSession($session);
 
                 return $request;

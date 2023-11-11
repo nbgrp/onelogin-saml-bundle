@@ -11,11 +11,15 @@ use Symfony\Component\Security\Core\User\UserProviderInterface;
 
 /**
  * Just instantiates user object with providing identifier and default roles.
+ *
+ * @template-covariant TUser of UserInterface
+ *
+ * @template-implements UserProviderInterface<TUser>
  */
 class SamlUserProvider implements UserProviderInterface
 {
     /**
-     * @param class-string<UserInterface> $userClass
+     * @param class-string<TUser> $userClass
      */
     public function __construct(
         protected string $userClass,
