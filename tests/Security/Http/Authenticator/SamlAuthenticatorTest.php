@@ -110,34 +110,14 @@ final class SamlAuthenticatorTest extends TestCase
         ];
     }
 
-    /**
-     * @dataProvider provideAuthenticateSessionExceptionCases
-     */
-    public function testAuthenticateSessionException(Request $request, string $expectedMessage): void
+    public function testAuthenticateSessionException(): void
     {
-        $authenticator = $this->createSamlAuthenticator(
-            options: ['require_previous_session' => true],
-        );
+        $authenticator = $this->createSamlAuthenticator();
 
         $this->expectException(SessionUnavailableException::class);
-        $this->expectExceptionMessage($expectedMessage);
+        $this->expectExceptionMessage('This authentication method requires a session.');
 
-        $authenticator->authenticate($request);
-    }
-
-    public function provideAuthenticateSessionExceptionCases(): iterable
-    {
-        yield 'No session' => [
-            'request' => Request::create('/'),
-            'expectedMessage' => 'This authentication method requires a session.',
-        ];
-
-        $request = Request::create('/');
-        $request->setSession(new Session(new MockArraySessionStorage()));
-        yield 'No cookies' => [
-            'request' => $request,
-            'expectedMessage' => 'Your session has timed out, or you have disabled cookies.',
-        ];
+        $authenticator->authenticate(Request::create('/'));
     }
 
     /**
@@ -160,7 +140,6 @@ final class SamlAuthenticatorTest extends TestCase
         $authenticator = $this->createSamlAuthenticator(
             idpResolver: $idpResolver,
             authRegistry: $authRegistry,
-            options: ['require_previous_session' => false],
             logger: $logger,
         );
 
@@ -248,7 +227,6 @@ final class SamlAuthenticatorTest extends TestCase
         $authenticator = $this->createSamlAuthenticator(
             idpResolver: $idpResolver,
             authRegistry: new AuthRegistry(),
-            options: ['require_previous_session' => false],
         );
 
         $this->expectException(AuthenticationServiceException::class);
@@ -358,7 +336,6 @@ final class SamlAuthenticatorTest extends TestCase
                 'samlUserFactory' => null,
                 'eventDispatcher' => null,
                 'options' => [
-                    'require_previous_session' => false,
                     'use_attribute_friendly_name' => false,
                 ],
                 'lastRequestId' => null,
@@ -438,7 +415,6 @@ final class SamlAuthenticatorTest extends TestCase
                 'samlUserFactory' => $samlUserFactory,
                 'eventDispatcher' => $eventDispatcher,
                 'options' => [
-                    'require_previous_session' => false,
                     'use_attribute_friendly_name' => true,
                     'identifier_attribute' => 'username',
                 ],
@@ -513,7 +489,6 @@ final class SamlAuthenticatorTest extends TestCase
                 'samlUserFactory' => null,
                 'eventDispatcher' => $eventDispatcher,
                 'options' => [
-                    'require_previous_session' => false,
                     'use_attribute_friendly_name' => true,
                     'identifier_attribute' => 'username',
                 ],
@@ -593,7 +568,6 @@ final class SamlAuthenticatorTest extends TestCase
                 'samlUserFactory' => null,
                 'options' => [
                     'identifier_attribute' => 'username',
-                    'require_previous_session' => false,
                 ],
                 'expectedException' => \RuntimeException::class,
                 'expectedMessage' => 'Attribute "username" not found in SAML data.',
@@ -624,7 +598,6 @@ final class SamlAuthenticatorTest extends TestCase
                 'samlUserFactory' => null,
                 'options' => [
                     'identifier_attribute' => 'username',
-                    'require_previous_session' => false,
                 ],
                 'expectedException' => \RuntimeException::class,
                 'expectedMessage' => 'Attribute "username" does not contain valid user identifier.',
@@ -658,9 +631,7 @@ final class SamlAuthenticatorTest extends TestCase
                 'auth' => $auth,
                 'userProvider' => $userProvider,
                 'samlUserFactory' => null,
-                'options' => [
-                    'require_previous_session' => false,
-                ],
+                'options' => [],
                 'expectedException' => UserNotFoundException::class,
                 'expectedMessage' => null,
             ];
@@ -699,9 +670,7 @@ final class SamlAuthenticatorTest extends TestCase
                 'auth' => $auth,
                 'userProvider' => $userProvider,
                 'samlUserFactory' => $samlUserFactory,
-                'options' => [
-                    'require_previous_session' => false,
-                ],
+                'options' => [],
                 'expectedException' => AuthenticationException::class,
                 'expectedMessage' => 'The authentication failed.',
             ];

@@ -81,10 +81,6 @@ class SamlAuthenticator implements AuthenticatorInterface, AuthenticationEntryPo
             throw new SessionUnavailableException('This authentication method requires a session.');
         }
 
-        if ($this->options['require_previous_session'] && !$request->hasPreviousSession()) {
-            throw new SessionUnavailableException('Your session has timed out, or you have disabled cookies.');
-        }
-
         $oneLoginAuth = $this->getOneLoginAuth($request);
         Utils::setProxyVars($this->useProxyVars);
 
