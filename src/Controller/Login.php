@@ -7,13 +7,13 @@ namespace Nbgrp\OneloginSamlBundle\Controller;
 
 use Nbgrp\OneloginSamlBundle\Security\Http\Authenticator\SamlAuthenticator;
 use OneLogin\Saml2\Auth;
-use Symfony\Bundle\SecurityBundle\Security;
 use Symfony\Bundle\SecurityBundle\Security\FirewallMap;
 use Symfony\Component\HttpFoundation\RedirectResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Session\SessionInterface;
 use Symfony\Component\HttpKernel\Attribute\AsController;
 use Symfony\Component\HttpKernel\Exception\ServiceUnavailableHttpException;
+use Symfony\Component\Security\Http\SecurityRequestAttributes;
 
 #[AsController]
 class Login
@@ -27,16 +27,16 @@ class Login
         $targetPath = null;
         $session = null;
         /** @var \Throwable|null $error */
-        $error = $request->attributes->get(Security::AUTHENTICATION_ERROR);
+        $error = $request->attributes->get(SecurityRequestAttributes::AUTHENTICATION_ERROR);
 
         if ($request->hasSession()) {
             $session = $request->getSession();
             $targetPath = $this->getTargetPath($request, $session);
 
-            if ($session->has(Security::AUTHENTICATION_ERROR)) {
+            if ($session->has(SecurityRequestAttributes::AUTHENTICATION_ERROR)) {
                 /** @var \Throwable|null $error */
-                $error = $session->get(Security::AUTHENTICATION_ERROR);
-                $session->remove(Security::AUTHENTICATION_ERROR);
+                $error = $session->get(SecurityRequestAttributes::AUTHENTICATION_ERROR);
+                $session->remove(SecurityRequestAttributes::AUTHENTICATION_ERROR);
             }
         }
 
