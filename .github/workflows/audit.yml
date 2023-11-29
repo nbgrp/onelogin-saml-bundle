@@ -7,7 +7,7 @@ jobs:
     name: Audit
     strategy:
       matrix:
-        php-version: [ '8.2' ]
+        php-version: [ '8.2', '8.3' ]
       fail-fast: false
     runs-on: ubuntu-latest
     steps:
