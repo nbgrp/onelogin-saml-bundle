@@ -35,11 +35,6 @@
         "symfony/event-dispatcher": "^6.4",
         "symfony/phpunit-bridge": "^6.4"
     },
-    "conflict": {
-        "symfony/http-kernel": "<6.2",
-        "symfony/security-core": "<6.2"
-    },
-    "minimum-stability": "dev",
     "autoload": {
         "psr-4": {
             "Nbgrp\\OneloginSamlBundle\\": "src/"
