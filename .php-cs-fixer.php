@@ -17,13 +17,13 @@ return (new PhpCsFixer\Config())
     ->setRiskyAllowed(true)
     ->setRules([
         // base presets
-        '@PER' => true,
+        '@PER-CS' => true,
         '@PhpCsFixer' => true,
         '@Symfony' => true,
         '@PHP81Migration' => true,
 
         // risky presets
-        '@PER:risky' => true,
+        '@PER-CS:risky' => true,
         '@PhpCsFixer:risky' => true,
         '@Symfony:risky' => true,
         '@PHP80Migration:risky' => true,
@@ -31,10 +31,12 @@ return (new PhpCsFixer\Config())
         // presets tuning
         'blank_line_after_opening_tag' => false,
         'blank_line_before_statement' => [
-            'statements' => ['case', 'default', 'return', 'throw', 'try'],
+            'statements' => ['case', 'default', 'declare', 'return', 'throw', 'try'],
         ],
         'comment_to_phpdoc' => [
             'ignored_tags' => [
+                'phan-suppress-current-line',
+                'phan-suppress-next-line',
                 'see',
                 'todo',
             ],

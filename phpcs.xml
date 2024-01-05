@@ -69,8 +69,10 @@
             <property name="modifiersOrder" type="array">
                 <element value="var" />
                 <element value="public, protected, private" />
-                <element value="static" />
+                <element value="static, readonly" />
             </property>
+            <property name="checkPromoted" value="true" />
+            <property name="enableMultipleSpacesBetweenModifiersCheck" value="true" />
         </properties>
     </rule>
     <rule ref="SlevomatCodingStandard.Classes.RequireConstructorPropertyPromotion" />

@@ -54,7 +54,7 @@ jobs:
           echo "::endgroup::"
 
       - name: Auditor
-        uses: docker://nbgrp/auditor:0.21.0
+        uses: docker://nbgrp/auditor:0.23.1
 
       - name: Tests
         run: vendor/bin/simple-phpunit

@@ -22,10 +22,8 @@ class SamlAuthenticationSuccessHandler extends DefaultAuthenticationSuccessHandl
             return (string) $this->options['default_target_path'];
         }
 
-        /** @psalm-suppress InvalidArgument */
         $relayState = $request->query->get(self::RELAY_STATE, $request->request->get(self::RELAY_STATE));
         if ($relayState !== null) {
-            /** @psalm-suppress RedundantCastGivenDocblockType */
             $relayState = (string) $relayState;
             if ($relayState !== $this->httpUtils->generateUri($request, (string) $this->options['login_path'])) {
                 return $relayState;
