@@ -36,7 +36,7 @@ final class SamlLogoutListenerTest extends TestCase
             ->willReturn($request)
         ;
         $event
-            ->expects($token ? self::once() : self::never())
+            ->expects(self::once())
             ->method('getToken')
             ->willReturn($token)
         ;
