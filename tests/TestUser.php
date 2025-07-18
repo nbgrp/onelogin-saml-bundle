@@ -5,9 +5,9 @@ declare(strict_types=1);
 
 namespace Nbgrp\Tests\OneloginSamlBundle;
 
-use Symfony\Component\Security\Core\User\UserInterface;
+use Nbgrp\OneloginSamlBundle\Security\User\SamlUserInterface;
 
-final class TestUser implements UserInterface
+final class TestUser implements SamlUserInterface
 {
     private string $email;
 
@@ -42,4 +42,6 @@ final class TestUser implements UserInterface
     {
         return $this->email;
     }
+
+    public function setSamlAttributes(array $attributes): void {}
 }

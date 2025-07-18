@@ -7,6 +7,7 @@ namespace Nbgrp\OneloginSamlBundle\Controller;
 
 use Nbgrp\OneloginSamlBundle\Security\Http\Authenticator\SamlAuthenticator;
 use OneLogin\Saml2\Auth;
+use OneLogin\Saml2\Error as Saml2Exception;
 use Symfony\Bundle\SecurityBundle\Security\FirewallMap;
 use Symfony\Component\HttpFoundation\RedirectResponse;
 use Symfony\Component\HttpFoundation\Request;
@@ -16,10 +17,10 @@ use Symfony\Component\HttpKernel\Exception\ServiceUnavailableHttpException;
 use Symfony\Component\Security\Http\SecurityRequestAttributes;
 
 #[AsController]
-class Login
+readonly class Login
 {
     public function __construct(
-        private readonly FirewallMap $firewallMap,
+        private FirewallMap $firewallMap,
     ) {}
 
     public function __invoke(Request $request, Auth $auth): RedirectResponse
@@ -44,30 +45,38 @@ class Login
             throw new \RuntimeException($error->getMessage());
         }
 
-        return new RedirectResponse($this->processLoginAndGetRedirectUrl($auth, $targetPath, $session));
+        try {
+            return new RedirectResponse($this->processLoginAndGetRedirectUrl($auth, $targetPath, $session));
+        } catch (Saml2Exception $e) {
+            throw new \RuntimeException($e->getMessage());
+        }
     }
 
-    /** @psalm-suppress MixedInferredReturnType, MixedReturnStatement */
     private function getTargetPath(Request $request, SessionInterface $session): ?string
     {
         $firewallName = $this->firewallMap->getFirewallConfig($request)?->getName();
-        if (!$firewallName) {
+        if (null === $firewallName || '' === $firewallName) {
             throw new ServiceUnavailableHttpException(message: 'Unknown firewall.');
         }
 
-        /** @phpstan-ignore-next-line */
-        return $session->get('_security.'.$firewallName.'.target_path');
+        $attribute = (string) $session->get('_security.'.$firewallName.'.target_path');
+
+        return ($attribute === '') ? null : $attribute;
     }
 
+    /**
+     * @throws Saml2Exception
+     */
     private function processLoginAndGetRedirectUrl(Auth $auth, ?string $targetPath, ?SessionInterface $session): string
     {
+        /** @var string|null $redirectUrl */
         $redirectUrl = $auth->login(returnTo: $targetPath, stay: true);
-        if ($redirectUrl === null) {
-            throw new \RuntimeException('Login cannot be performed: Auth did not returned redirect url.');
+        if (null === $redirectUrl) {
+            throw new \RuntimeException('Unable to initiate SAML login process.');
         }
 
         $security = $auth->getSettings()->getSecurityData();
-        if (($security['rejectUnsolicitedResponsesWithInResponseTo'] ?? false) && $session instanceof SessionInterface) {
+        if ((($security['rejectUnsolicitedResponsesWithInResponseTo'] ?? false) === true) && $session instanceof SessionInterface) {
             $session->set(SamlAuthenticator::LAST_REQUEST_ID, $auth->getLastRequestID());
         }
 

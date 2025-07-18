@@ -11,7 +11,11 @@ use Symfony\Component\Security\Http\Authenticator\Token\PostAuthenticationToken;
 class SamlToken extends PostAuthenticationToken
 {
     /**
-     * @param array<string> $roles
+     * Constructor for the SAML authentication token.
+     * This token is used to store the authenticated user and their SAML attributes.
+     *
+     * @param array<string>          $roles
+     * @param array<array-key,mixed> $samlAttributes
      */
     public function __construct(UserInterface $user, string $firewallName, array $roles, array $samlAttributes)
     {

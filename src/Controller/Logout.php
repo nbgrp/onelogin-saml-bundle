@@ -8,7 +8,7 @@ namespace Nbgrp\OneloginSamlBundle\Controller;
 use Symfony\Component\HttpKernel\Attribute\AsController;
 
 #[AsController]
-class Logout
+readonly class Logout
 {
     public function __invoke(): void
     {

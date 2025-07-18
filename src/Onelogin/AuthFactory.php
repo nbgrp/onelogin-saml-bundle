@@ -6,6 +6,7 @@ declare(strict_types=1);
 namespace Nbgrp\OneloginSamlBundle\Onelogin;
 
 use OneLogin\Saml2\Auth;
+use OneLogin\Saml2\Error;
 use Symfony\Component\HttpFoundation\RequestStack;
 
 final class AuthFactory
@@ -16,6 +17,13 @@ final class AuthFactory
         private readonly RequestStack $requestStack,
     ) {}
 
+    /**
+     * Create a new OneLogin Auth instance with settings.
+     *
+     * @param array<string, mixed> $settings
+     *
+     * @throws Error
+     */
     public function __invoke(array $settings): Auth
     {
         $request = $this->requestStack->getMainRequest();
@@ -28,24 +36,65 @@ final class AuthFactory
     }
 
     /**
-     * @psalm-suppress MixedArrayAssignment, MixedArrayAccess
+     * Replace the scheme and host placeholder in the settings array.
+     *
+     * @param array<string, mixed> $settings
+     *
+     * @return array<string, mixed>
      */
     private static function replaceSchemeAndHostPlaceholder(array $settings, string $replace): array
     {
         if (isset($settings['baseurl'])) {
-            $settings['baseurl'] = str_replace(self::SCHEME_AND_HOST_PLACEHOLDER, $replace, (string) $settings['baseurl']);
+            $settings['baseurl'] = str_replace(
+                self::SCHEME_AND_HOST_PLACEHOLDER,
+                $replace,
+                (string) $settings['baseurl']
+            );
         }
 
-        if (isset($settings['sp']['entityId'])) {
-            $settings['sp']['entityId'] = str_replace(self::SCHEME_AND_HOST_PLACEHOLDER, $replace, (string) $settings['sp']['entityId']);
-        }
+        if (isset($settings['sp']) && \is_array($settings['sp'])) {
+            /** @var array<string, mixed> $sp */
+            $sp = $settings['sp'];
 
-        if (isset($settings['sp']['assertionConsumerService']['url'])) {
-            $settings['sp']['assertionConsumerService']['url'] = str_replace(self::SCHEME_AND_HOST_PLACEHOLDER, $replace, (string) $settings['sp']['assertionConsumerService']['url']); // @phan-suppress-current-line PhanTypeArraySuspiciousNull, PhanTypeInvalidDimOffset
-        }
+            if (isset($sp['entityId'])) {
+                $sp['entityId'] = str_replace(
+                    self::SCHEME_AND_HOST_PLACEHOLDER,
+                    $replace,
+                    (string) $sp['entityId']
+                );
+            }
 
-        if (isset($settings['sp']['singleLogoutService']['url'])) {
-            $settings['sp']['singleLogoutService']['url'] = str_replace(self::SCHEME_AND_HOST_PLACEHOLDER, $replace, (string) $settings['sp']['singleLogoutService']['url']); // @phan-suppress-current-line PhanTypeArraySuspiciousNull, PhanTypeInvalidDimOffset
+            if (isset($sp['assertionConsumerService']) && \is_array($sp['assertionConsumerService'])) {
+                /** @var array<string, mixed> $acs */
+                $acs = $sp['assertionConsumerService'];
+
+                if (isset($acs['url'])) {
+                    $acs['url'] = str_replace(
+                        self::SCHEME_AND_HOST_PLACEHOLDER,
+                        $replace,
+                        (string) $acs['url']
+                    );
+                }
+
+                $sp['assertionConsumerService'] = $acs;
+            }
+
+            if (isset($sp['singleLogoutService']) && \is_array($sp['singleLogoutService'])) {
+                /** @var array<string, mixed> $sls */
+                $sls = $sp['singleLogoutService'];
+
+                if (isset($sls['url'])) {
+                    $sls['url'] = str_replace(
+                        self::SCHEME_AND_HOST_PLACEHOLDER,
+                        $replace,
+                        (string) $sls['url']
+                    );
+                }
+
+                $sp['singleLogoutService'] = $sls;
+            }
+
+            $settings['sp'] = $sp;
         }
 
         return $settings;

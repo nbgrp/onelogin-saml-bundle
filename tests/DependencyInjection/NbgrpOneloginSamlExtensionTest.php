@@ -12,14 +12,14 @@ use Nbgrp\OneloginSamlBundle\EventListener\User\UserModifiedListener;
 use Nbgrp\OneloginSamlBundle\Idp\IdpResolverInterface;
 use Nbgrp\OneloginSamlBundle\Onelogin\AuthRegistryInterface;
 use Nbgrp\OneloginSamlBundle\Security\Http\Authenticator\SamlAuthenticator;
+use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 
 /**
- * @covers \Nbgrp\OneloginSamlBundle\DependencyInjection\NbgrpOneloginSamlExtension
- *
  * @internal
  */
+#[CoversClass(NbgrpOneloginSamlExtension::class)]
 final class NbgrpOneloginSamlExtensionTest extends TestCase
 {
     public function testLoad(): void
@@ -60,12 +60,14 @@ final class NbgrpOneloginSamlExtensionTest extends TestCase
                     ],
                 ],
                 'sp' => [
-                    'entityId' => 'test-sp',
-                    'assertionConsumerService' => [
-                        'url' => 'http://example.com/saml/acs',
-                    ],
-                    'singleLogoutService' => [
-                        'url' => '<request_scheme_and_host>/saml/logout',
+                    'default' => [
+                        'entityId' => 'test-sp',
+                        'assertionConsumerService' => [
+                            'url' => 'http://example.com/saml/acs',
+                        ],
+                        'singleLogoutService' => [
+                            'url' => '<request_scheme_and_host>/saml/logout',
+                        ],
                     ],
                 ],
                 'baseurl' => '<request_scheme_and_host>/saml/',

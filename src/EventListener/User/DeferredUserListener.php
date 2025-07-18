@@ -21,7 +21,7 @@ final class DeferredUserListener
         }
 
         $deferredEvent = $badge->getEvent();
-        if ($deferredEvent) {
+        if (null !== $deferredEvent) {
             $eventDispatcher->dispatch($deferredEvent);
         }
     }

@@ -18,12 +18,23 @@ final class SamlUserFactory implements SamlUserFactoryInterface
         private readonly array $mapping,
     ) {}
 
+    /**
+     * Creates a user instance based on the provided identifier and attributes.
+     *
+     * @param string                  $identifier the unique identifier for the user
+     * @param array<array-key, mixed> $attributes the attributes associated with the user
+     *
+     * @return UserInterface the created user instance
+     *
+     * @throws \ReflectionException
+     */
+    #[\Override]
     public function createUser(string $identifier, array $attributes): UserInterface
     {
         $user = new $this->userClass($identifier);
         $reflection = new \ReflectionClass($this->userClass);
 
-        /** @psalm-suppress MixedAssignment */
+        /** @psalm-suppress MixedAssignment, MixedArgumentTypeCoercion */
         foreach ($this->mapping as $field => $attribute) {
             $property = $reflection->getProperty($field);
             $property->setValue(
@@ -37,6 +48,16 @@ final class SamlUserFactory implements SamlUserFactoryInterface
         return $user;
     }
 
+    /**
+     * Retrieves the value of a specific attribute from the provided attributes array.
+     *
+     * @param array<string, mixed> $attributes the attributes array
+     * @param string               $attribute  the attribute to retrieve
+     *
+     * @return mixed the value of the attribute
+     *
+     * @throws \RuntimeException if the attribute is not found in the attributes array
+     */
     private function getAttributeValue(array $attributes, string $attribute): mixed
     {
         $isArrayValue = str_ends_with($attribute, '[]');

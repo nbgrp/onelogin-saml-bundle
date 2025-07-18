@@ -7,18 +7,20 @@ namespace Nbgrp\Tests\OneloginSamlBundle\DependencyInjection\Security\UserProvid
 
 use Nbgrp\OneloginSamlBundle\DependencyInjection\Security\UserProvider\SamlUserProviderFactory;
 use Nbgrp\Tests\OneloginSamlBundle\TestUser;
+use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\Config\Definition\Builder\ArrayNodeDefinition;
 use Symfony\Component\Config\Definition\Exception\InvalidConfigurationException;
+use Symfony\Component\DependencyInjection\ChildDefinition;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 
 /**
- * @covers \Nbgrp\OneloginSamlBundle\DependencyInjection\Security\UserProvider\SamlUserProviderFactory
- *
  * @internal
  */
+#[CoversClass(SamlUserProviderFactory::class)]
 final class SamlUserProviderFactoryTest extends TestCase
 {
+    /** @psalm-suppress PropertyNotSetInConstructor */
     private SamlUserProviderFactory $factory;
 
     public function testDefaultConfiguration(): void
@@ -39,7 +41,7 @@ final class SamlUserProviderFactoryTest extends TestCase
         $this->factory->addConfiguration($nodeDefinition);
 
         $node = $nodeDefinition->getNode();
-        /** @var array $normalized */
+        /** @var array<string,mixed> $normalized */
         $normalized = $node->normalize([]);
 
         $this->expectException(InvalidConfigurationException::class);
@@ -53,7 +55,7 @@ final class SamlUserProviderFactoryTest extends TestCase
         $this->factory->addConfiguration($nodeDefinition);
 
         $node = $nodeDefinition->getNode();
-        /** @var array $normalized */
+        /** @var array<string,mixed> $normalized */
         $normalized = $node->normalize(['user_class' => \stdClass::class]);
 
         $this->expectException(InvalidConfigurationException::class);
@@ -69,7 +71,7 @@ final class SamlUserProviderFactoryTest extends TestCase
             'default_roles' => ['ROLE_USER'],
         ]);
 
-        /** @var \Symfony\Component\DependencyInjection\ChildDefinition $providerDefinition */
+        /** @var ChildDefinition $providerDefinition */
         $providerDefinition = $container->getDefinition('provider_id');
         self::assertSame(TestUser::class, $providerDefinition->getArgument(0));
         self::assertSame(['ROLE_USER'], $providerDefinition->getArgument(1));

@@ -1,0 +1,8 @@
+parameters:
+    level: 8
+    paths:
+        - src/
+        - tests/
+    excludePaths:
+        - src/DependencyInjection/Configuration.php
+        - src/DependencyInjection/Security/UserProvider/SamlUserProviderFactory.php

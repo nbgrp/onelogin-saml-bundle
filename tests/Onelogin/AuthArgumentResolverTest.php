@@ -9,31 +9,31 @@ use Nbgrp\OneloginSamlBundle\Idp\IdpResolver;
 use Nbgrp\OneloginSamlBundle\Onelogin\AuthArgumentResolver;
 use Nbgrp\OneloginSamlBundle\Onelogin\AuthRegistry;
 use OneLogin\Saml2\Auth;
+use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpKernel\ControllerMetadata\ArgumentMetadata;
 use Symfony\Component\HttpKernel\Exception\BadRequestHttpException;
-use Symfony\Component\HttpKernel\Exception\ServiceUnavailableHttpException;
 
 /**
- * @covers \Nbgrp\OneloginSamlBundle\Onelogin\AuthArgumentResolver
  *
  * @internal
  *
  * @psalm-suppress MixedArgumentTypeCoercion
  */
+#[CoversClass(AuthArgumentResolver::class)]
 final class AuthArgumentResolverTest extends TestCase
 {
     public function testResolve(): void
     {
         $authRegistry = new AuthRegistry();
-        $idpResolver = new IdpResolver('idp');
+        $idpResolver = new IdpResolver('idp', 'sp');
 
-        $defaultAuth = $this->createStub(Auth::class);
-        $authRegistry->addService('default', $defaultAuth);
+        $defaultAuth = self::createStub(Auth::class);
+        $authRegistry->addService('default', 'default', $defaultAuth);
 
-        $additionalAuth = $this->createStub(Auth::class);
-        $authRegistry->addService('additional', $additionalAuth);
+        $additionalAuth = self::createStub(Auth::class);
+        $authRegistry->addService('additional', 'default', $additionalAuth);
 
         $resolver = new AuthArgumentResolver($authRegistry, $idpResolver);
         $argument = new ArgumentMetadata('foo', Auth::class, false, false, null);
@@ -41,11 +41,11 @@ final class AuthArgumentResolverTest extends TestCase
         $queryRequest = new Request(['idp' => 'additional']);
         $attributesRequest = new Request([], [], ['idp' => 'additional']);
 
-        self::assertSame($additionalAuth, self::iterableValue($resolver->resolve($queryRequest, $argument)));
-        self::assertSame($additionalAuth, self::iterableValue($resolver->resolve($attributesRequest, $argument)));
+        self::assertEquals($additionalAuth, self::iterableValue($resolver->resolve($queryRequest, $argument)));
+        self::assertEquals($additionalAuth, self::iterableValue($resolver->resolve($attributesRequest, $argument)));
 
-        self::assertSame($defaultAuth, self::iterableValue($resolver->resolve(new Request(), $argument)));
-        self::assertSame($defaultAuth, self::iterableValue($resolver->resolve(new Request(['idp' => '']), $argument)));
+        self::assertEquals($defaultAuth, self::iterableValue($resolver->resolve(new Request(), $argument)));
+        self::assertEquals($defaultAuth, self::iterableValue($resolver->resolve(new Request(['idp' => '']), $argument)));
 
         self::assertNull(self::iterableValue($resolver->resolve(new Request(), $argument), true));
     }
@@ -53,23 +53,24 @@ final class AuthArgumentResolverTest extends TestCase
     public function testResolveWithoutIdpException(): void
     {
         $authRegistry = new AuthRegistry();
-        $idpResolver = new IdpResolver('idp');
+        $idpResolver = new IdpResolver('idp', 'sp');
         $resolver = new AuthArgumentResolver($authRegistry, $idpResolver);
         $argument = new ArgumentMetadata('foo', Auth::class, false, false, null);
 
-        $this->expectException(ServiceUnavailableHttpException::class);
+        $this->expectException(BadRequestHttpException::class);
+        $this->expectExceptionMessage('There is no OneLogin PHP toolkit settings for IdP "default" and SP "default". See nbgrp_onelogin_saml config ("onelogin_settings" section).');
         self::iterableValue($resolver->resolve(new Request(), $argument));
     }
 
     public function testResolveWithoutOneloginSettingsException(): void
     {
         $authRegistry = new AuthRegistry();
-        $idpResolver = new IdpResolver('idp');
+        $idpResolver = new IdpResolver('idp', 'sp');
         $resolver = new AuthArgumentResolver($authRegistry, $idpResolver);
         $argument = new ArgumentMetadata('foo', Auth::class, false, false, null);
 
         $this->expectException(BadRequestHttpException::class);
-        $this->expectExceptionMessage('There is no OneLogin PHP toolkit settings for IdP "unknown". See nbgrp_onelogin_saml config ("onelogin_settings" section).');
+        $this->expectExceptionMessage('There is no OneLogin PHP toolkit settings for IdP "unknown" and SP "default". See nbgrp_onelogin_saml config ("onelogin_settings" section).');
         self::iterableValue($resolver->resolve(new Request(['idp' => 'unknown']), $argument));
     }
 

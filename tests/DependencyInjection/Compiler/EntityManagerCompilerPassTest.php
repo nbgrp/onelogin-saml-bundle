@@ -8,16 +8,16 @@ namespace Nbgrp\Tests\OneloginSamlBundle\DependencyInjection\Compiler;
 use Nbgrp\OneloginSamlBundle\DependencyInjection\Compiler\EntityManagerCompilerPass;
 use Nbgrp\OneloginSamlBundle\EventListener\User\UserCreatedListener;
 use Nbgrp\OneloginSamlBundle\EventListener\User\UserModifiedListener;
+use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\DependencyInjection\ChildDefinition;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\DependencyInjection\Definition;
 
 /**
- * @covers \Nbgrp\OneloginSamlBundle\DependencyInjection\Compiler\EntityManagerCompilerPass
- *
  * @internal
  */
+#[CoversClass(EntityManagerCompilerPass::class)]
 final class EntityManagerCompilerPassTest extends TestCase
 {
     public function testNoProcess(): void

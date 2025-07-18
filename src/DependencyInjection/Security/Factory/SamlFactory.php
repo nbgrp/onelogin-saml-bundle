@@ -30,17 +30,20 @@ class SamlFactory extends AbstractFactory
         $this->addOption('success_handler', SamlAuthenticationSuccessHandler::class);
     }
 
+    #[\Override]
     public function getPriority(): int
     {
         return self::PRIORITY;
     }
 
+    #[\Override]
     public function getKey(): string
     {
         return 'saml';
     }
 
     /** @psalm-suppress MixedArgument */
+    #[\Override]
     public function createAuthenticator(ContainerBuilder $container, string $firewallName, array $config, string $userProviderId): string
     {
         $authenticatorId = 'security.authenticator.saml.'.$firewallName;
@@ -50,9 +53,7 @@ class SamlFactory extends AbstractFactory
             ->replaceArgument(5, new Reference($this->createAuthenticationFailureHandler($container, $firewallName, $config)))
             ->replaceArgument(6, array_intersect_key($config, $this->options))
         ;
-
-        if (!empty($config['user_factory'])) {
-            /** @phpstan-ignore-next-line */
+        if (isset($config['user_factory']) && '' !== (string) $config['user_factory'] && [] !== $config['user_factory']) {
             $authenticator->replaceArgument(7, new Reference((string) $config['user_factory']));
         }
 
@@ -63,6 +64,11 @@ class SamlFactory extends AbstractFactory
         return $authenticatorId;
     }
 
+    /**
+     * Crea los listeners de usuario para el firewall SAML.
+     *
+     * @param array<string,mixed> $config
+     */
     protected function createUserListeners(ContainerBuilder $container, string $firewallName, array $config): void
     {
         $container->setDefinition('nbgrp_onelogin_saml.user_created_listener.'.$firewallName, new ChildDefinition(UserCreatedListener::class))

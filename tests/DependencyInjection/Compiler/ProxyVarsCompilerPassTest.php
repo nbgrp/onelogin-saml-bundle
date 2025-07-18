@@ -7,19 +7,18 @@ namespace Nbgrp\Tests\OneloginSamlBundle\DependencyInjection\Compiler;
 
 use Nbgrp\OneloginSamlBundle\DependencyInjection\Compiler\ProxyVarsCompilerPass;
 use OneLogin\Saml2\Utils;
+use PHPUnit\Framework\Attributes\CoversClass;
+use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 
 /**
- * @covers \Nbgrp\OneloginSamlBundle\DependencyInjection\Compiler\ProxyVarsCompilerPass
- *
  * @internal
  */
+#[CoversClass(ProxyVarsCompilerPass::class)]
 final class ProxyVarsCompilerPassTest extends TestCase
 {
-    /**
-     * @dataProvider provideProcessCases
-     */
+    #[DataProvider('provideProcessCases')]
     public function testProcess(bool $useVars): void
     {
         $container = new ContainerBuilder();
@@ -30,7 +29,8 @@ final class ProxyVarsCompilerPassTest extends TestCase
         self::assertSame($useVars, Utils::getProxyVars());
     }
 
-    public function provideProcessCases(): iterable
+    /** @return iterable<array{useVars:bool}> */
+    public static function provideProcessCases(): iterable
     {
         yield 'Use vars' => [
             'useVars' => true,

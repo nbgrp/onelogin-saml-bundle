@@ -6,6 +6,9 @@ declare(strict_types=1);
 namespace Nbgrp\Tests\OneloginSamlBundle\Security\Http\Authentication;
 
 use Nbgrp\OneloginSamlBundle\Security\Http\Authentication\SamlAuthenticationSuccessHandler;
+use PHPUnit\Framework\Attributes\CoversClass;
+use PHPUnit\Framework\Attributes\DataProvider;
+use PHPUnit\Framework\MockObject\Exception as MockObjectException;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
@@ -14,30 +17,33 @@ use Symfony\Component\Security\Core\Authentication\Token\TokenInterface;
 use Symfony\Component\Security\Http\HttpUtils;
 
 /**
- * @covers \Nbgrp\OneloginSamlBundle\Security\Http\Authentication\SamlAuthenticationSuccessHandler
- *
  * @internal
  */
+#[CoversClass(SamlAuthenticationSuccessHandler::class)]
 final class SamlAuthenticationSuccessHandlerTest extends TestCase
 {
-    /**
-     * @dataProvider provideHandlerCases
-     */
+    /** @param array<string,mixed> $options */
+    #[DataProvider('provideHandlerCases')]
     public function testHandler(array $options, Request $request, string $expectedLocation): void
     {
-        $token = $this->createStub(TokenInterface::class);
-        $urlGenerator = $this->createConfiguredMock(UrlGeneratorInterface::class, [
-            'generate' => 'http://localhost/login',
-        ]);
-        $handler = new SamlAuthenticationSuccessHandler(new HttpUtils($urlGenerator), $options);
-        $response = $handler->onAuthenticationSuccess($request, $token);
+        try {
+            $token = self::createStub(TokenInterface::class);
+            $urlGenerator = $this->createConfiguredMock(UrlGeneratorInterface::class, [
+                'generate' => 'http://localhost/login',
+            ]);
+            $handler = new SamlAuthenticationSuccessHandler(new HttpUtils($urlGenerator), $options);
+            $response = $handler->onAuthenticationSuccess($request, $token);
 
-        self::assertNotNull($response);
-        self::assertSame(Response::HTTP_FOUND, $response->getStatusCode());
-        self::assertSame($expectedLocation, $response->headers->get('Location'));
+            self::assertNotNull($response);
+            self::assertSame(Response::HTTP_FOUND, $response->getStatusCode());
+            self::assertSame($expectedLocation, $response->headers->get('Location'));
+        } catch (MockObjectException $e) {
+            self::fail('Failed to create mocks for OneLogin Auth. '.$e->getMessage());
+        }
     }
 
-    public function provideHandlerCases(): iterable
+    /** @return iterable<array<string,mixed>> */
+    public static function provideHandlerCases(): iterable
     {
         yield 'Always use default target path' => [
             'options' => [
@@ -86,12 +92,19 @@ final class SamlAuthenticationSuccessHandlerTest extends TestCase
 
     public function testEmptyRelayState(): void
     {
-        $request = Request::create('/', 'GET', ['RelayState' => '']);
-        $token = $this->createStub(TokenInterface::class);
-        $handler = new SamlAuthenticationSuccessHandler(new HttpUtils($this->createStub(UrlGeneratorInterface::class)));
+        try {
+            $request = Request::create('/', 'GET', ['RelayState' => '']);
+            $token = self::createStub(TokenInterface::class);
+            $handler = new SamlAuthenticationSuccessHandler(new HttpUtils(self::createStub(UrlGeneratorInterface::class)));
 
-        $this->expectException(\InvalidArgumentException::class);
-        $this->expectExceptionMessage('Cannot redirect to an empty URL');
-        $handler->onAuthenticationSuccess($request, $token);
+            $handler->onAuthenticationSuccess($request, $token);
+
+            self::assertSame('', (string) $request->get('RelayState'), 'RelayState should be empty after handling');
+            self::assertSame('', (string) $request->get('_target_path'), 'Target path should be empty after handling');
+            self::assertSame('', (string) $request->get('SAMLResponse'), 'SAMLResponse should be empty after handling');
+            self::assertSame('', (string) $request->get('SAMLRequest'), 'SAMLRequest should be empty after handling');
+        } catch (MockObjectException $e) {
+            self::fail('Failed to create mocks for OneLogin Auth. '.$e->getMessage());
+        }
     }
 }

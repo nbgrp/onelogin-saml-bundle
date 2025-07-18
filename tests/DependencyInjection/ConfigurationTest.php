@@ -6,28 +6,32 @@ declare(strict_types=1);
 namespace Nbgrp\Tests\OneloginSamlBundle\DependencyInjection;
 
 use Nbgrp\OneloginSamlBundle\DependencyInjection\Configuration;
+use PHPUnit\Framework\Attributes\CoversClass;
+use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\Config\Definition\Exception\InvalidConfigurationException;
 use Symfony\Component\Config\Definition\Processor;
 
 /**
- * @covers \Nbgrp\OneloginSamlBundle\DependencyInjection\Configuration
- *
  * @internal
  */
+#[CoversClass(Configuration::class)]
 final class ConfigurationTest extends TestCase
 {
     private Processor $processor;
 
     /**
-     * @dataProvider provideValidConfigCases
+     * @param array<string,mixed> $config
+     * @param array<string,mixed> $expected
      */
+    #[DataProvider('provideValidConfigCases')]
     public function testValidConfig(array $config, array $expected): void
     {
         self::assertSame($expected, $this->processor->processConfiguration(new Configuration(), [$config]));
     }
 
-    public function provideValidConfigCases(): iterable
+    /** @return iterable<string, array{config: array<string,mixed>, expected: array<string,mixed>}> */
+    public static function provideValidConfigCases(): iterable
     {
         yield 'Simple configuration' => [
             'config' => [
@@ -51,20 +55,23 @@ final class ConfigurationTest extends TestCase
                                 'url' => 'http://example.com/sso',
                             ],
                         ],
-                        'baseurl' => '<request_scheme_and_host>/saml/',
                         'sp' => [
-                            'entityId' => '<request_scheme_and_host>/saml/metadata',
-                            'assertionConsumerService' => [
-                                'url' => '<request_scheme_and_host>/saml/acs',
-                            ],
-                            'singleLogoutService' => [
-                                'url' => '<request_scheme_and_host>/saml/logout',
+                            'default' => [
+                                'entityId' => '<request_scheme_and_host>/saml/metadata',
+                                'assertionConsumerService' => [
+                                    'url' => '<request_scheme_and_host>/saml/acs',
+                                ],
+                                'singleLogoutService' => [
+                                    'url' => '<request_scheme_and_host>/saml/logout',
+                                ],
                             ],
                         ],
+                        'baseurl' => '<request_scheme_and_host>/saml/',
                     ],
                 ],
                 'use_proxy_vars' => false,
                 'idp_parameter_name' => 'idp',
+                'sp_parameter_name' => 'sp',
             ],
         ];
 
@@ -177,6 +184,7 @@ final class ConfigurationTest extends TestCase
                 ],
                 'use_proxy_vars' => true,
                 'idp_parameter_name' => 'custom-idp',
+                'sp_parameter_name' => 'custom-sp',
                 'entity_manager_name' => 'custom-em',
             ],
             'expected' => [
@@ -211,19 +219,21 @@ final class ConfigurationTest extends TestCase
                             ],
                         ],
                         'sp' => [
-                            'entityId' => 'test-sp',
-                            'assertionConsumerService' => [
-                                'url' => 'http://example.com/saml/acs',
-                                'binding' => 'urn:oasis:names:tc:SAML:2.0:bindings:HTTP-POST',
+                            'default' => [
+                                'entityId' => 'test-sp',
+                                'assertionConsumerService' => [
+                                    'url' => 'http://example.com/saml/acs',
+                                    'binding' => 'urn:oasis:names:tc:SAML:2.0:bindings:HTTP-POST',
+                                ],
+                                'singleLogoutService' => [
+                                    'url' => 'http://example.com/saml/logout',
+                                    'binding' => 'urn:oasis:names:tc:SAML:2.0:bindings:HTTP-Redirect',
+                                ],
+                                'NameIDFormat' => 'urn:oasis:names:tc:SAML:1.1:nameid-format:emailAddress',
+                                'x509cert' => 'x509cert-data',
+                                'privateKey' => 'private-key',
+                                'x509certNew' => 'some-new-x509cert',
                             ],
-                            'singleLogoutService' => [
-                                'url' => 'http://example.com/saml/logout',
-                                'binding' => 'urn:oasis:names:tc:SAML:2.0:bindings:HTTP-Redirect',
-                            ],
-                            'NameIDFormat' => 'urn:oasis:names:tc:SAML:1.1:nameid-format:emailAddress',
-                            'x509cert' => 'x509cert-data',
-                            'privateKey' => 'private-key',
-                            'x509certNew' => 'some-new-x509cert',
                         ],
                         'compress' => [
                             'requests' => false,
@@ -282,13 +292,15 @@ final class ConfigurationTest extends TestCase
                             ],
                         ],
                         'sp' => [
-                            'entityId' => 'test-sp',
-                            'assertionConsumerService' => [
-                                'url' => 'http://example.com/saml/acs',
-                                'binding' => 'urn:oasis:names:tc:SAML:2.0:bindings:HTTP-POST',
-                            ],
-                            'singleLogoutService' => [
-                                'url' => '<request_scheme_and_host>/saml/logout',
+                            'default' => [
+                                'entityId' => 'test-sp',
+                                'assertionConsumerService' => [
+                                    'url' => 'http://example.com/saml/acs',
+                                    'binding' => 'urn:oasis:names:tc:SAML:2.0:bindings:HTTP-POST',
+                                ],
+                                'singleLogoutService' => [
+                                    'url' => '<request_scheme_and_host>/saml/logout',
+                                ],
                             ],
                         ],
                         'baseurl' => '<request_scheme_and_host>/saml/',
@@ -296,14 +308,16 @@ final class ConfigurationTest extends TestCase
                 ],
                 'use_proxy_vars' => true,
                 'idp_parameter_name' => 'custom-idp',
+                'sp_parameter_name' => 'custom-sp',
                 'entity_manager_name' => 'custom-em',
             ],
         ];
     }
 
     /**
-     * @dataProvider provideConfigWithInvalidOneLoginSettingsExceptionCases
+     * @param array<string,mixed> $config
      */
+    #[DataProvider('provideConfigWithInvalidOneLoginSettingsExceptionCases')]
     public function testConfigWithInvalidOneLoginSettingsException(array $config, string $expectedMessage): void
     {
         $this->expectException(InvalidConfigurationException::class);
@@ -311,7 +325,8 @@ final class ConfigurationTest extends TestCase
         $this->processor->processConfiguration(new Configuration(), [$config]);
     }
 
-    public function provideConfigWithInvalidOneLoginSettingsExceptionCases(): iterable
+    /** @return iterable<string, array{config: array<string,mixed>, expectedMessage: string}> */
+    public static function provideConfigWithInvalidOneLoginSettingsExceptionCases(): iterable
     {
         yield 'Empty idp OneLogin settings' => [
             'config' => [
@@ -412,7 +427,7 @@ final class ConfigurationTest extends TestCase
                     ],
                 ],
             ],
-            'expectedMessage' => 'Invalid configuration for path "nbgrp_onelogin_saml.onelogin_settings.test.sp.assertionConsumerService.binding": invalid value.',
+            'expectedMessage' => 'Invalid configuration for path "nbgrp_onelogin_saml.onelogin_settings.test.sp.default.assertionConsumerService.binding": invalid value.',
         ];
 
         yield 'Invalid singleLogoutService binding for SP OneLogin settings' => [
@@ -439,7 +454,7 @@ final class ConfigurationTest extends TestCase
                     ],
                 ],
             ],
-            'expectedMessage' => 'Invalid configuration for path "nbgrp_onelogin_saml.onelogin_settings.test.sp.singleLogoutService.binding": invalid value.',
+            'expectedMessage' => 'Invalid configuration for path "nbgrp_onelogin_saml.onelogin_settings.test.sp.default.singleLogoutService.binding": invalid value.',
         ];
 
         yield 'Invalid NameIDFormat for SP OneLogin settings' => [
@@ -463,7 +478,7 @@ final class ConfigurationTest extends TestCase
                     ],
                 ],
             ],
-            'expectedMessage' => 'Invalid configuration for path "nbgrp_onelogin_saml.onelogin_settings.test.sp.NameIDFormat": invalid value.',
+            'expectedMessage' => 'Invalid configuration for path "nbgrp_onelogin_saml.onelogin_settings.test.sp.default.NameIDFormat": invalid value.',
         ];
 
         yield 'Invalid requestedAuthnContext type for security OneLogin settings' => [

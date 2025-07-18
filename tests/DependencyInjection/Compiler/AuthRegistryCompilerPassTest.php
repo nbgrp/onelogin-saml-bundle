@@ -7,15 +7,15 @@ namespace Nbgrp\Tests\OneloginSamlBundle\DependencyInjection\Compiler;
 
 use Nbgrp\OneloginSamlBundle\DependencyInjection\Compiler\AuthRegistryCompilerPass;
 use Nbgrp\OneloginSamlBundle\Onelogin\AuthRegistryInterface;
+use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\DependencyInjection\Definition;
 
 /**
- * @covers \Nbgrp\OneloginSamlBundle\DependencyInjection\Compiler\AuthRegistryCompilerPass
- *
  * @internal
  */
+#[CoversClass(AuthRegistryCompilerPass::class)]
 final class AuthRegistryCompilerPassTest extends TestCase
 {
     public function testSuccessProcess(): void
@@ -32,7 +32,7 @@ final class AuthRegistryCompilerPassTest extends TestCase
         $authRegistryDefinition = $container->getDefinition(AuthRegistryInterface::class);
         self::assertCount(2, $authRegistryDefinition->getMethodCalls());
 
-        /** @var array $call */
+        /** @var array<string,mixed> $call */
         foreach ($authRegistryDefinition->getMethodCalls() as $call) {
             self::assertSame('addService', reset($call));
         }

@@ -7,23 +7,30 @@ namespace Nbgrp\OneloginSamlBundle\Idp;
 
 use Symfony\Component\HttpFoundation\Request;
 
-final class IdpResolver implements IdpResolverInterface
+final readonly class IdpResolver implements IdpResolverInterface
 {
     public function __construct(
-        private readonly string $idpParameterName,
+        private string $idpParameterName,
+        private string $spParameterName,
     ) {}
 
-    public function resolve(Request $request): ?string
+    /**
+     * {@inheritdoc}
+     */
+    #[\Override]
+    public function resolve(Request $request): array
     {
-        if ($request->query->has($this->idpParameterName)) {
-            return (string) $request->query->get($this->idpParameterName);
-        }
+        // Get IdP and SP names from query parameters or request attributes
+        $queryIdp = (string) $request->query->get($this->idpParameterName);
+        $querySp = (string) $request->query->get($this->spParameterName);
+        $attributesIdp = (string) $request->attributes->get($this->idpParameterName, 'default');
+        $attributesSp = (string) $request->attributes->get($this->spParameterName, 'default');
 
-        if ($request->attributes->has($this->idpParameterName)) {
-            /** @phpstan-ignore-next-line */
-            return (string) $request->attributes->get($this->idpParameterName);
-        }
+        // If query parameters are not set, use attributes
+        $idp = '' !== $queryIdp ? $queryIdp : $attributesIdp;
+        $sp = '' !== $querySp ? $querySp : $attributesSp;
 
-        return null;
+        // If both IdP and SP are not set, return default values
+        return ['idp' => $idp, 'sp' => $sp];
     }
 }

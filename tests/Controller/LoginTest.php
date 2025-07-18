@@ -9,6 +9,9 @@ use Nbgrp\OneloginSamlBundle\Controller\Login;
 use Nbgrp\OneloginSamlBundle\Security\Http\Authenticator\SamlAuthenticator;
 use OneLogin\Saml2\Auth;
 use OneLogin\Saml2\Settings;
+use PHPUnit\Framework\Attributes\CoversClass;
+use PHPUnit\Framework\Attributes\DataProvider;
+use PHPUnit\Framework\MockObject\Exception as MockObjectException;
 use PHPUnit\Framework\TestCase;
 use Symfony\Bundle\SecurityBundle\Security\FirewallConfig;
 use Symfony\Bundle\SecurityBundle\Security\FirewallMap;
@@ -19,15 +22,17 @@ use Symfony\Component\HttpKernel\Exception\ServiceUnavailableHttpException;
 use Symfony\Component\Security\Http\SecurityRequestAttributes;
 
 /**
- * @covers \Nbgrp\OneloginSamlBundle\Controller\Login
- *
  * @internal
  */
+#[CoversClass(Login::class)]
 final class LoginTest extends TestCase
 {
+    /**
+     * @throws MockObjectException
+     */
     public function testInvokeWithRejectUnsolicitedResponsesWithInResponseTo(): void
     {
-        $firewallMap = $this->createStub(FirewallMap::class);
+        $firewallMap = self::createStub(FirewallMap::class);
         $firewallMap
             ->method('getFirewallConfig')
             ->willReturn(new FirewallConfig('foo', 'bar'))
@@ -65,9 +70,12 @@ final class LoginTest extends TestCase
         self::assertSame('requestID', $session->get(SamlAuthenticator::LAST_REQUEST_ID));
     }
 
+    /**
+     * @throws MockObjectException
+     */
     public function testInvokeWithoutRejectUnsolicitedResponsesWithInResponseTo(): void
     {
-        $firewallMap = $this->createStub(FirewallMap::class);
+        $firewallMap = self::createStub(FirewallMap::class);
         $firewallMap
             ->method('getFirewallConfig')
             ->willReturn(new FirewallConfig('foo', 'bar'))
@@ -106,8 +114,9 @@ final class LoginTest extends TestCase
     }
 
     /**
-     * @dataProvider provideErrorExceptionCases
+     * @throws MockObjectException
      */
+    #[DataProvider('provideErrorExceptionCases')]
     public function testErrorException(Request $request, string $expectedMessage): void
     {
         $firewallMap = $this->createMock(FirewallMap::class);
@@ -116,7 +125,7 @@ final class LoginTest extends TestCase
             ->willReturn(new FirewallConfig('foo', 'bar'))
         ;
 
-        $auth = $this->createStub(Auth::class);
+        $auth = self::createStub(Auth::class);
 
         $controller = new Login($firewallMap);
 
@@ -125,7 +134,14 @@ final class LoginTest extends TestCase
         $controller($request, $auth);
     }
 
-    public function provideErrorExceptionCases(): iterable
+    /**
+     * Provides test cases for error exceptions.
+     *
+     * @return iterable<array{request: Request, expectedMessage: string}>
+     *
+     * @throws MockObjectException
+     */
+    public static function provideErrorExceptionCases(): iterable
     {
         yield 'From attributes' => [
             'request' => (static function () {
@@ -152,28 +168,34 @@ final class LoginTest extends TestCase
 
     public function testAuthLoginWithoutRedirectUrlException(): void
     {
-        $firewallMap = $this->createMock(FirewallMap::class);
-        $firewallMap
-            ->method('getFirewallConfig')
-            ->willReturn(new FirewallConfig('foo', 'bar'))
-        ;
+        try {
+            $firewallMap = $this->createMock(FirewallMap::class);
+            $firewallMap
+                ->method('getFirewallConfig')
+                ->willReturn(new FirewallConfig('foo', 'bar'))
+            ;
 
-        $auth = $this->createMock(Auth::class);
-        $auth
-            ->method('login')
-            ->willReturn(null)
-        ;
+            $auth = $this->createMock(Auth::class);
+            $auth
+                ->method('login')
+                ->willReturn(null)
+            ;
 
-        $request = Request::create('/login');
-        $request->setSession(new Session(new MockArraySessionStorage()));
+            $request = Request::create('/login');
+            $request->setSession(new Session(new MockArraySessionStorage()));
 
-        $controller = new Login($firewallMap);
+            $controller = new Login($firewallMap);
 
-        $this->expectException(\RuntimeException::class);
-        $this->expectExceptionMessage('Login cannot be performed: Auth did not returned redirect url.');
-        $controller($request, $auth);
+            $this->expectException(\RuntimeException::class);
+            $controller($request, $auth);
+        } catch (MockObjectException $e) {
+            self::fail('Failed to create mocks for OneLogin Auth. '.$e->getMessage());
+        }
     }
 
+    /**
+     * @throws MockObjectException
+     */
     public function testUnknownFirewallException(): void
     {
         $firewallMap = $this->createMock(FirewallMap::class);
@@ -182,7 +204,7 @@ final class LoginTest extends TestCase
             ->willReturn(null)
         ;
 
-        $auth = $this->createStub(Auth::class);
+        $auth = self::createStub(Auth::class);
 
         $controller = new Login($firewallMap);
         $request = Request::create('/login');

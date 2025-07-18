@@ -18,6 +18,7 @@ use Symfony\Component\DependencyInjection\Reference;
  */
 class AuthRegistryCompilerPass implements CompilerPassInterface
 {
+    #[\Override]
     public function process(ContainerBuilder $container): void
     {
         $authRegistry = $container->getDefinition(AuthRegistryInterface::class);
@@ -27,11 +28,31 @@ class AuthRegistryCompilerPass implements CompilerPassInterface
             throw new \UnexpectedValueException('OneLogin settings should be an array.');
         }
 
-        /** @var array $settings */
-        foreach ($oneloginSettings as $key => $settings) {
-            $authDefinition = new Definition(Auth::class, [$settings]);
-            $authDefinition->setFactory(new Reference(AuthFactory::class));
-            $authRegistry->addMethodCall('addService', [$key, $authDefinition]);
+        /** @var array<string,mixed> $idpSettings */
+        foreach ($oneloginSettings as $idpKey => $idpSettings) {
+            /** @var array<string, mixed> $settings */
+            $settings = $idpSettings;
+            if (isset($idpSettings['sp'])) {
+                if (!\is_array($idpSettings['sp'])) {
+                    throw new \UnexpectedValueException('OneLogin SP settings should be an array.');
+                }
+                /** @var array<string,mixed>|null $spSettings */
+                foreach ($idpSettings['sp'] as $spKey => $spSettings) {
+                    if (!\is_array($spSettings)) {
+                        throw new \UnexpectedValueException('OneLogin SP settings for key "'.(string) $spKey.'" should be an array.');
+                    }
+
+                    $settings['sp'] = $spSettings;
+                    $authDefinition = new Definition(Auth::class, [$settings]);
+                    $authDefinition->setFactory(new Reference(AuthFactory::class));
+                    $authRegistry->addMethodCall('addService', [$idpKey, $spKey, $authDefinition]);
+                }
+            } else {
+                $settings['sp'] = 'default';
+                $authDefinition = new Definition(Auth::class, [$settings]);
+                $authDefinition->setFactory(new Reference(AuthFactory::class));
+                $authRegistry->addMethodCall('addService', [$idpKey, 'default', $authDefinition]);
+            }
         }
     }
 }

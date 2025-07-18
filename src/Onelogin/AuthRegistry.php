@@ -10,37 +10,59 @@ use OneLogin\Saml2\Auth;
 final class AuthRegistry implements AuthRegistryInterface
 {
     /**
-     * @var array<string, Auth>
+     * @var array<string,array<string, Auth>>
      */
     private array $services = [];
 
-    public function addService(string $key, Auth $auth): self
+    #[\Override]
+    public function addService(string $idpKey, string $spKey, Auth $auth): self
     {
-        if (\array_key_exists($key, $this->services)) {
-            throw new \OverflowException('Auth service with key "'.$key.'" already exists.');
+        if (\array_key_exists($idpKey, $this->services)) {
+            if (\array_key_exists($spKey, $this->services[$idpKey])) {
+                throw new \OverflowException('Auth service with key "'.$spKey.'" already exists.');
+            }
         }
 
-        $this->services[$key] = $auth;
+        $this->services[$idpKey][$spKey] = $auth;
 
         return $this;
     }
 
-    public function hasService(string $key): bool
+    #[\Override]
+    public function hasService(string $idpKey, string $spKey): bool
     {
-        return \array_key_exists($key, $this->services);
+        if (\array_key_exists($idpKey, $this->services)) {
+            if (\array_key_exists($spKey, $this->services[$idpKey])) {
+                return true;
+            }
+        }
+
+        return false;
     }
 
-    public function getService(string $key): Auth
+    /**
+     * {@inheritdoc}
+     */
+    #[\Override]
+    public function getService(string $idpKey, string $spKey): Auth
     {
-        return $this->services[$key] ?? throw new \OutOfBoundsException('Auth service for key "'.$key.'" does not exists.');
+        return $this->services[$idpKey][$spKey] ?? throw new \OutOfBoundsException('Auth service for keys "'.$idpKey.' '.$spKey.'" does not exists.');
     }
 
+    #[\Override]
     public function getDefaultService(): Auth
     {
-        if (empty($this->services)) {
+        if ([] === $this->services) {
             throw new \UnderflowException('There is no configured Auth services.');
         }
 
-        return reset($this->services);
+        $firstIdp = reset($this->services);
+        $firstAuth = reset($firstIdp);
+
+        if (!$firstAuth instanceof Auth) {
+            throw new \UnderflowException('There is no configured Auth services.');
+        }
+
+        return $firstAuth;
     }
 }

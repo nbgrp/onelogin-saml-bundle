@@ -18,19 +18,20 @@ class SamlAuthenticationSuccessHandler extends DefaultAuthenticationSuccessHandl
     public const RELAY_STATE = 'RelayState';
 
     /** @psalm-suppress MixedArrayAccess */
+    #[\Override]
     protected function determineTargetUrl(Request $request): string
     {
         if ($this->options['always_use_default_target_path']) {
             return (string) $this->options['default_target_path'];
         }
 
-        /** @psalm-suppress InvalidArgument */
-        $relayState = $request->query->get(self::RELAY_STATE, $request->request->get(self::RELAY_STATE));
-        if ($relayState !== null && $this->httpUtils instanceof HttpUtils) {
-            /** @psalm-suppress RedundantCastGivenDocblockType */
-            $relayState = (string) $relayState;
+        $relayState = $request->query->get(self::RELAY_STATE, '');
+        if ('' === $relayState) {
+            $relayState = $request->request->get(self::RELAY_STATE, '');
+        }
+        if ('' !== $relayState && $this->httpUtils instanceof HttpUtils) {
             if ($relayState !== $this->httpUtils->generateUri($request, (string) $this->options['login_path'])) {
-                return $relayState;
+                return (string) $relayState;
             }
         }
 

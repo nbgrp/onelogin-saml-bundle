@@ -6,18 +6,20 @@ declare(strict_types=1);
 namespace Nbgrp\Tests\OneloginSamlBundle\Security\Http\Authenticator\Passport\Badge;
 
 use Nbgrp\OneloginSamlBundle\Security\Http\Authenticator\Passport\Badge\SamlAttributesBadge;
+use PHPUnit\Framework\Attributes\CoversClass;
+use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
 
 /**
- * @covers \Nbgrp\OneloginSamlBundle\Security\Http\Authenticator\Passport\Badge\SamlAttributesBadge
- *
  * @internal
  */
+#[CoversClass(SamlAttributesBadge::class)]
 final class SamlAttributesBadgeTest extends TestCase
 {
     /**
-     * @dataProvider provideBadgeCases
+     * @param array<string,mixed> $attributes
      */
+    #[DataProvider('provideBadgeCases')]
     public function testBadge(array $attributes): void
     {
         $badge = new SamlAttributesBadge($attributes);
@@ -26,7 +28,8 @@ final class SamlAttributesBadgeTest extends TestCase
         self::assertTrue($badge->isResolved());
     }
 
-    public function provideBadgeCases(): iterable
+    /** @return iterable<array<string,mixed>> */
+    public static function provideBadgeCases(): iterable
     {
         yield 'Empty attributes' => [
             'attributes' => [],

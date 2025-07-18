@@ -7,15 +7,18 @@ namespace Nbgrp\Tests\OneloginSamlBundle\Security\User;
 
 use Nbgrp\OneloginSamlBundle\Security\User\SamlUserFactory;
 use Nbgrp\Tests\OneloginSamlBundle\TestUser;
+use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\TestCase;
 
 /**
- * @covers \Nbgrp\OneloginSamlBundle\Security\User\SamlUserFactory
- *
  * @internal
  */
+#[CoversClass(SamlUserFactory::class)]
 final class SamlUserFactoryTest extends TestCase
 {
+    /**
+     * @throws \ReflectionException
+     */
     public function testCreateUser(): void
     {
         $factory = new SamlUserFactory(TestUser::class, [
@@ -34,6 +37,9 @@ final class SamlUserFactoryTest extends TestCase
         self::assertSame('tester@example.com', $user->getEmail());
     }
 
+    /**
+     * @throws \ReflectionException
+     */
     public function testCreateUserException(): void
     {
         $factory = new SamlUserFactory(TestUser::class, [

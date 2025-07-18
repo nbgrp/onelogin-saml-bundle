@@ -8,48 +8,60 @@ namespace Nbgrp\Tests\OneloginSamlBundle\Onelogin;
 use Nbgrp\OneloginSamlBundle\Onelogin\AuthRegistry;
 use Nbgrp\OneloginSamlBundle\Onelogin\AuthRegistryInterface;
 use OneLogin\Saml2\Auth;
+use PHPUnit\Framework\Attributes\CoversClass;
+use PHPUnit\Framework\MockObject\Exception;
 use PHPUnit\Framework\TestCase;
 
 /**
- * @covers \Nbgrp\OneloginSamlBundle\Onelogin\AuthRegistry
- *
  * @internal
  */
+#[CoversClass(AuthRegistry::class)]
 final class AuthRegistryTest extends TestCase
 {
     private AuthRegistryInterface $registry;
 
+    /**
+     * @throws Exception
+     */
     public function testRegistry(): void
     {
-        $defaultAuth = $this->createStub(Auth::class);
-        $this->registry->addService('default', $defaultAuth);
+        $defaultAuth = self::createStub(Auth::class);
+        $this->registry->addService('default', 'default', $defaultAuth);
 
-        $additionalAuth = $this->createStub(Auth::class);
-        $this->registry->addService('additional', $additionalAuth);
+        $defaultAdditionalAuth = self::createStub(Auth::class);
+        $this->registry->addService('default', 'additional', $defaultAdditionalAuth);
 
-        self::assertTrue($this->registry->hasService('default'));
-        self::assertTrue($this->registry->hasService('additional'));
-        self::assertFalse($this->registry->hasService('undefined'));
+        $additionalAuth = self::createStub(Auth::class);
+        $this->registry->addService('additional', 'default', $additionalAuth);
 
-        self::assertSame($this->registry->getService('additional'), $additionalAuth);
+        self::assertTrue($this->registry->hasService('default', 'default'));
+        self::assertTrue($this->registry->hasService('additional', 'default'));
+        self::assertFalse($this->registry->hasService('undefined', 'default'));
+
+        self::assertSame($this->registry->getService('default', 'default'), $defaultAuth);
+        self::assertSame($this->registry->getService('default', 'additional'), $defaultAdditionalAuth);
+        self::assertSame($this->registry->getService('additional', 'default'), $additionalAuth);
         self::assertSame($this->registry->getDefaultService(), $defaultAuth);
     }
 
     public function testGetNotExistsServiceException(): void
     {
         $this->expectException(\OutOfBoundsException::class);
-        $this->expectExceptionMessage('Auth service for key "undefined" does not exists.');
-        $this->registry->getService('undefined');
+        $this->expectExceptionMessage('Auth service for keys "undefined undefined" does not exists.');
+        $this->registry->getService('undefined', 'undefined');
     }
 
+    /**
+     * @throws Exception
+     */
     public function testAddExistenceServiceException(): void
     {
-        $defaultAuth = $this->createStub(Auth::class);
-        $this->registry->addService('default', $defaultAuth);
+        $defaultAuth = self::createStub(Auth::class);
+        $this->registry->addService('default', 'default', $defaultAuth);
 
         $this->expectException(\OverflowException::class);
         $this->expectExceptionMessage('Auth service with key "default" already exists.');
-        $this->registry->addService('default', $defaultAuth);
+        $this->registry->addService('default', 'default', $defaultAuth);
     }
 
     public function testEmptyRegistryDefaultService(): void

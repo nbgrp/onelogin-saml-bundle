@@ -14,6 +14,7 @@ use Symfony\Component\DependencyInjection\Reference;
  */
 class EntityManagerCompilerPass implements CompilerPassInterface
 {
+    #[\Override]
     public function process(ContainerBuilder $container): void
     {
         if (!$container->hasParameter('nbgrp_onelogin_saml.entity_manager')) {

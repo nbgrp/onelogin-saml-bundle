@@ -1,10 +1,12 @@
 <?php
+
 // SPDX-License-Identifier: BSD-3-Clause
 
 declare(strict_types=1);
 
 namespace Nbgrp\OneloginSamlBundle\DependencyInjection;
 
+use Symfony\Component\Config\Definition\Builder\ArrayNodeDefinition;
 use Symfony\Component\Config\Definition\Builder\TreeBuilder;
 use Symfony\Component\Config\Definition\ConfigurationInterface;
 
@@ -15,14 +17,16 @@ class Configuration implements ConfigurationInterface
 {
     /**
      * @suppress PhanPossiblyNonClassMethodCall, PhanPossiblyUndeclaredMethod, PhanUndeclaredMethod
+     *
+     * @psalm-suppress PossiblyNullReference, UndefinedInterfaceMethod, MixedMethodCall
      */
     public function getConfigTreeBuilder(): TreeBuilder
     {
         $treeBuilder = new TreeBuilder('nbgrp_onelogin_saml');
+        /** @var ArrayNodeDefinition $rootNode */
         $rootNode = $treeBuilder->getRootNode();
 
         // @formatter:off
-        /** @phpstan-ignore-next-line */
         $rootNode
             ->info('nb:group OneLogin PHP Symfony Bundle configuration')
             ->children()
@@ -31,6 +35,27 @@ class Configuration implements ConfigurationInterface
                     ->useAttributeAsKey('name')
                     ->normalizeKeys(false)
                     ->arrayPrototype()
+                        ->beforeNormalization()
+                        ->always(function ($v) {
+                            // Si no hay 'sp', meter default vacío
+                            if (!isset($v['sp']) || $v['sp'] === []) {
+                                $v['sp'] = ['default' => []];
+                            }
+
+                            // Si 'sp' es un array plano (i.e. no es indexado por string con valores que son arrays)
+                            if (isset($v['sp']) && is_array($v['sp'])) {
+                                $isAssoc = static fn ($arr) => array_keys($arr) !== range(0, count($arr) - 1);
+                                $isLikelyFlatSp = $isAssoc($v['sp']) && array_filter($v['sp'], 'is_array') === [];
+
+                                if ($isLikelyFlatSp || isset($v['sp']['entityId'])) {
+                                    $v['sp'] = ['default' => $v['sp']];
+                                }
+                            }
+
+
+                            return $v;
+                        })
+                        ->end()
                         ->children()
                             ->scalarNode('baseurl')
                                 ->defaultValue('<request_scheme_and_host>/saml/')
@@ -87,67 +112,69 @@ class Configuration implements ConfigurationInterface
                                 ->end()
                             ->end()
                             ->arrayNode('sp')
-                                ->addDefaultsIfNotSet()
-                                ->children()
-                                    ->scalarNode('entityId')
-                                        ->defaultValue('<request_scheme_and_host>/saml/metadata')
-                                    ->end()
-                                    ->arrayNode('assertionConsumerService')
-                                        ->addDefaultsIfNotSet()
-                                        ->children()
-                                            ->scalarNode('url')
-                                                ->defaultValue('<request_scheme_and_host>/saml/acs')
-                                            ->end()
-                                            ->scalarNode('binding')
-                                                ->validate()
-                                                    ->ifTrue(static fn ($value): bool => !str_starts_with($value, 'urn:oasis:names:tc:SAML:2.0:bindings:'))
-                                                    ->thenInvalid('invalid value.')
-                                                ->end()
-                                            ->end()
+                                ->useAttributeAsKey('name')
+                                ->arrayPrototype()
+                                    ->children()
+                                        ->scalarNode('entityId')
+                                            ->defaultValue('<request_scheme_and_host>/saml/metadata')
                                         ->end()
-                                    ->end()
-                                    ->arrayNode('attributeConsumingService')
-                                        ->children()
-                                            ->scalarNode('serviceName')->end()
-                                            ->scalarNode('serviceDescription')->end()
-                                            ->arrayNode('requestedAttributes')
-                                                ->arrayPrototype()
-                                                    ->children()
-                                                        ->scalarNode('name')->end()
-                                                        ->booleanNode('isRequired')
-                                                            ->defaultFalse()
-                                                        ->end()
-                                                        ->scalarNode('nameFormat')->end()
-                                                        ->scalarNode('friendlyName')->end()
-                                                        ->arrayNode('attributeValue')->end()
+                                        ->arrayNode('assertionConsumerService')
+                                            ->addDefaultsIfNotSet()
+                                            ->children()
+                                                ->scalarNode('url')
+                                                    ->defaultValue('<request_scheme_and_host>/saml/acs')
+                                                ->end()
+                                                ->scalarNode('binding')
+                                                    ->validate()
+                                                        ->ifTrue(static fn ($value): bool => !str_starts_with($value, 'urn:oasis:names:tc:SAML:2.0:bindings:'))
+                                                        ->thenInvalid('invalid value.')
                                                     ->end()
                                                 ->end()
                                             ->end()
                                         ->end()
-                                    ->end()
-                                    ->arrayNode('singleLogoutService')
-                                        ->addDefaultsIfNotSet()
-                                        ->children()
-                                            ->scalarNode('url')
-                                                ->defaultValue('<request_scheme_and_host>/saml/logout')
-                                            ->end()
-                                            ->scalarNode('binding')
-                                                ->validate()
-                                                    ->ifTrue(static fn ($value): bool => !str_starts_with($value, 'urn:oasis:names:tc:SAML:2.0:bindings:'))
-                                                    ->thenInvalid('invalid value.')
+                                        ->arrayNode('attributeConsumingService')
+                                            ->children()
+                                                ->scalarNode('serviceName')->end()
+                                                ->scalarNode('serviceDescription')->end()
+                                                ->arrayNode('requestedAttributes')
+                                                    ->arrayPrototype()
+                                                        ->children()
+                                                            ->scalarNode('name')->end()
+                                                            ->booleanNode('isRequired')
+                                                                ->defaultFalse()
+                                                            ->end()
+                                                            ->scalarNode('nameFormat')->end()
+                                                            ->scalarNode('friendlyName')->end()
+                                                            ->arrayNode('attributeValue')->end()
+                                                        ->end()
+                                                    ->end()
                                                 ->end()
                                             ->end()
                                         ->end()
-                                    ->end()
-                                    ->scalarNode('NameIDFormat')
-                                        ->validate()
-                                            ->ifTrue(static fn ($value): bool => !(str_starts_with($value, 'urn:oasis:names:tc:SAML:1.1:nameid-format:') || str_starts_with($value, 'urn:oasis:names:tc:SAML:2.0:nameid-format:')))
-                                            ->thenInvalid('invalid value.')
+                                        ->arrayNode('singleLogoutService')
+                                            ->addDefaultsIfNotSet()
+                                            ->children()
+                                                ->scalarNode('url')
+                                                    ->defaultValue('<request_scheme_and_host>/saml/logout')
+                                                ->end()
+                                                ->scalarNode('binding')
+                                                    ->validate()
+                                                        ->ifTrue(static fn ($value): bool => !str_starts_with($value, 'urn:oasis:names:tc:SAML:2.0:bindings:'))
+                                                        ->thenInvalid('invalid value.')
+                                                    ->end()
+                                                ->end()
+                                            ->end()
                                         ->end()
+                                        ->scalarNode('NameIDFormat')
+                                            ->validate()
+                                                ->ifTrue(static fn ($value): bool => !(str_starts_with($value, 'urn:oasis:names:tc:SAML:1.1:nameid-format:') || str_starts_with($value, 'urn:oasis:names:tc:SAML:2.0:nameid-format:')))
+                                                ->thenInvalid('invalid value.')
+                                            ->end()
+                                        ->end()
+                                        ->scalarNode('x509cert')->end()
+                                        ->scalarNode('privateKey')->end()
+                                        ->scalarNode('x509certNew')->end()
                                     ->end()
-                                    ->scalarNode('x509cert')->end()
-                                    ->scalarNode('privateKey')->end()
-                                    ->scalarNode('x509certNew')->end()
                                 ->end()
                             ->end()
                             ->arrayNode('compress')
@@ -174,7 +201,7 @@ class Configuration implements ConfigurationInterface
                                             ->thenInvalid('must be an array or a boolean.')
                                         ->end()
                                         ->validate()
-                                            ->ifTrue(static fn ($value) => \is_array($value) && array_filter($value, static fn ($item): bool => !str_starts_with($item, 'urn:oasis:names:tc:SAML:2.0:ac:classes:')))
+                                            ->ifTrue(static fn ($value) => \is_array($value) && \count(array_filter($value, static fn ($item): bool => !str_starts_with($item, 'urn:oasis:names:tc:SAML:2.0:ac:classes:'))) > 0)
                                             ->thenInvalid('invalid value.')
                                         ->end()
                                     ->end()
@@ -285,7 +312,9 @@ class Configuration implements ConfigurationInterface
                             ->end()
                         ->end()
                         ->validate()
-                            ->ifTrue(static fn ($value): bool => empty($value['organization']))
+                            ->ifTrue(
+                                static fn ($value): bool => !isset($value['organization']) || [] === $value['organization']
+                            )
                             ->then(static fn ($value): array => array_diff_key($value, ['organization' => null]))
                         ->end()
                     ->end()
@@ -297,13 +326,15 @@ class Configuration implements ConfigurationInterface
                     ->cannotBeEmpty()
                     ->defaultValue('idp')
                 ->end()
+                ->scalarNode('sp_parameter_name')
+                    ->cannotBeEmpty()
+                    ->defaultValue('sp')
+                ->end()
                 ->scalarNode('entity_manager_name')
                     ->cannotBeEmpty()
                 ->end()
             ->end()
         ;
-        // @formatter:on
-
         return $treeBuilder;
     }
 }

@@ -5,18 +5,18 @@ declare(strict_types=1);
 
 namespace Nbgrp\Tests\OneloginSamlBundle\Security\User;
 
+use Nbgrp\OneloginSamlBundle\Security\User\SamlUserInterface;
 use Nbgrp\OneloginSamlBundle\Security\User\SamlUserProvider;
 use Nbgrp\Tests\OneloginSamlBundle\TestUser;
+use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\Security\Core\Exception\UnsupportedUserException;
 use Symfony\Component\Security\Core\User\InMemoryUser;
-use Symfony\Component\Security\Core\User\UserInterface;
 
 /**
- * @covers \Nbgrp\OneloginSamlBundle\Security\User\SamlUserProvider
- *
  * @internal
  */
+#[CoversClass(SamlUserProvider::class)]
 final class SamlUserProviderTest extends TestCase
 {
     public function testLoadUserByIdentifier(): void
@@ -53,7 +53,7 @@ final class SamlUserProviderTest extends TestCase
 
     public function testSupportsSubclass(): void
     {
-        $provider = new SamlUserProvider(UserInterface::class, []);
+        $provider = new SamlUserProvider(SamlUserInterface::class, []);
         self::assertTrue($provider->supportsClass(TestUser::class));
     }
 
@@ -66,7 +66,7 @@ final class SamlUserProviderTest extends TestCase
     public function testInvalidUserClass(): void
     {
         $this->expectException(\InvalidArgumentException::class);
-        $this->expectExceptionMessage('The $userClass argument should be a class implementing the Symfony\Component\Security\Core\User\UserInterface interface.');
+        $this->expectExceptionMessage('The $userClass argument should be a class implementing the Nbgrp\OneloginSamlBundle\Security\User\SamlUserInterface');
         /**
          * @psalm-suppress InvalidArgument
          * @phpstan-ignore-next-line

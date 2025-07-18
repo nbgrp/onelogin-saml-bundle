@@ -13,11 +13,13 @@
         <ignoreFiles>
             <file name="src/DependencyInjection/Configuration.php" />
             <file name="src/DependencyInjection/Security/UserProvider/SamlUserProviderFactory.php" />
-            <file name="vendor/symfony/security-http/Authentication/DefaultAuthenticationSuccessHandler.php" />
+            <directory name="vendor" />
         </ignoreFiles>
     </projectFiles>
-
     <plugins>
         <pluginClass class="Psalm\SymfonyPsalmPlugin\Plugin" />
     </plugins>
+    <issueHandlers>
+        <ClassMustBeFinal errorLevel="info" />
+    </issueHandlers>
 </psalm>

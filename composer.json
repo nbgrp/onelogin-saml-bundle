@@ -33,7 +33,12 @@
     "require-dev": {
         "doctrine/orm": "^2.3 || ^3",
         "symfony/event-dispatcher": "^6.4",
-        "symfony/phpunit-bridge": "^6.4"
+        "symfony/phpunit-bridge": "^6.4",
+        "symfony/test-pack": "^1.2",
+        "phpstan/phpstan": "^2.1",
+        "vimeo/psalm": "^6.13",
+        "friendsofphp/php-cs-fixer": "^3.84",
+        "psalm/plugin-symfony": "^5.2"
     },
     "autoload": {
         "psr-4": {

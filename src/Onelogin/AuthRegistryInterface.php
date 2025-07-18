@@ -12,11 +12,16 @@ use OneLogin\Saml2\Auth;
  */
 interface AuthRegistryInterface
 {
-    public function addService(string $key, Auth $auth): self;
+    public function addService(string $idpKey, string $spKey, Auth $auth): self;
 
-    public function hasService(string $key): bool;
+    public function hasService(string $idpKey, string $spKey): bool;
 
-    public function getService(string $key): Auth;
+    /**
+     * Get the Auth service for the given IdP and SP keys.
+     *
+     * @throws \OutOfBoundsException if the service does not exist
+     */
+    public function getService(string $idpKey, string $spKey): Auth;
 
     public function getDefaultService(): Auth;
 }

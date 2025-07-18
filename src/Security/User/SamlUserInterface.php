@@ -12,5 +12,10 @@ use Symfony\Component\Security\Core\User\UserInterface;
  */
 interface SamlUserInterface extends UserInterface
 {
+    /**
+     * Sets the SAML attributes for the user.
+     *
+     * @param array<array-key, mixed> $attributes
+     */
     public function setSamlAttributes(array $attributes): void;
 }

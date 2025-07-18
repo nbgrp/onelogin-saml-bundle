@@ -11,36 +11,34 @@ use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpKernel\Controller\ValueResolverInterface;
 use Symfony\Component\HttpKernel\ControllerMetadata\ArgumentMetadata;
 use Symfony\Component\HttpKernel\Exception\BadRequestHttpException;
-use Symfony\Component\HttpKernel\Exception\ServiceUnavailableHttpException;
 
 /**
  * Yields the OneLogin Auth instance for current request
  * (default or according to an idp parameter).
  */
-final class AuthArgumentResolver implements ValueResolverInterface
+final readonly class AuthArgumentResolver implements ValueResolverInterface
 {
     public function __construct(
-        private readonly AuthRegistryInterface $authRegistry,
-        private readonly IdpResolverInterface $idpResolver,
+        private AuthRegistryInterface $authRegistry,
+        private IdpResolverInterface $idpResolver,
     ) {}
 
+    /** @phpstan-ignore-next-line  */
+    #[\Override]
     public function resolve(Request $request, ArgumentMetadata $argument): iterable
     {
-        if ($argument->getType() !== Auth::class) {
+        if (Auth::class !== $argument->getType()) {
             return [];
         }
 
-        $idp = $this->idpResolver->resolve($request);
-        if ($idp && !$this->authRegistry->hasService($idp)) {
-            throw new BadRequestHttpException('There is no OneLogin PHP toolkit settings for IdP "'.$idp.'". See nbgrp_onelogin_saml config ("onelogin_settings" section).');
+        $resolve = $this->idpResolver->resolve($request);
+        $idp = $resolve['idp'];
+        $sp = $resolve['sp'];
+        if (!$this->authRegistry->hasService($idp, $sp)) {
+            throw new BadRequestHttpException('There is no OneLogin PHP toolkit settings for IdP "'.$idp.'" and SP "'.$sp.'". See nbgrp_onelogin_saml config ("onelogin_settings" section).');
         }
-
-        try {
-            yield $idp
-                ? $this->authRegistry->getService($idp)
-                : $this->authRegistry->getDefaultService();
-        } catch (\RuntimeException $exception) {
-            throw new ServiceUnavailableHttpException($exception->getMessage());
-        }
+        yield ('default' !== $idp && 'default' !== $sp)
+            ? $this->authRegistry->getService($idp, $sp)
+            : $this->authRegistry->getDefaultService();
     }
 }

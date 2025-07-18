@@ -10,27 +10,26 @@ use Nbgrp\OneloginSamlBundle\Onelogin\AuthRegistryInterface;
 use Nbgrp\OneloginSamlBundle\Security\Http\Authenticator\SamlAuthenticator;
 use Nbgrp\OneloginSamlBundle\Security\Http\Authenticator\Token\SamlToken;
 use OneLogin\Saml2\Auth;
+use OneLogin\Saml2\Error;
 use Symfony\Component\EventDispatcher\Attribute\AsEventListener;
+use Symfony\Component\HttpFoundation\RedirectResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\Security\Http\Event\LogoutEvent;
 
 /**
  * Process Single Logout by current OneLogin Auth service on user logout.
  */
-final class SamlLogoutListener
+final readonly class SamlLogoutListener
 {
     public function __construct(
-        private readonly AuthRegistryInterface $authRegistry,
-        private readonly IdpResolverInterface $idpResolver,
+        private AuthRegistryInterface $authRegistry,
+        private IdpResolverInterface $idpResolver,
     ) {}
 
     #[AsEventListener(LogoutEvent::class)]
     public function processSingleLogout(LogoutEvent $event): void
     {
         $authService = $this->getAuthService($event->getRequest());
-        if (!$authService) {
-            return;
-        }
 
         $token = $event->getToken();
         if (!$token instanceof SamlToken) {
@@ -39,28 +38,33 @@ final class SamlLogoutListener
 
         try {
             $authService->processSLO();
-        } catch (\OneLogin\Saml2\Error) {
-            if (!empty($authService->getSLOurl())) {
+        } catch (Error) {
+            $sloUrl = $authService->getSLOurl();
+            if (null !== $sloUrl && '' !== $sloUrl) {
                 /** @var string|null $sessionIndex */
                 $sessionIndex = $token->hasAttribute(SamlAuthenticator::SESSION_INDEX_ATTRIBUTE)
                     ? $token->getAttribute(SamlAuthenticator::SESSION_INDEX_ATTRIBUTE)
                     : null;
-                $authService->logout(null, [], $token->getUserIdentifier(), $sessionIndex);
+
+                try {
+                    $authService->logout(null, [], $token->getUserIdentifier(), $sessionIndex);
+                } catch (Error $e) {
+                    // If logout fails, we can still redirect to SLO URL.
+                    // This is useful for IdPs that do not support SLO.
+                    $event->setResponse(new RedirectResponse($sloUrl));
+                }
             }
         }
     }
 
-    private function getAuthService(Request $request): ?Auth
+    private function getAuthService(Request $request): Auth
     {
-        $idp = $this->idpResolver->resolve($request);
-        if (!$idp) {
-            return $this->authRegistry->getDefaultService();
-        }
+        $resolve = $this->idpResolver->resolve($request);
+        $idp = $resolve['idp'];
+        $sp = $resolve['sp'];
 
-        if ($this->authRegistry->hasService($idp)) {
-            return $this->authRegistry->getService($idp);
-        }
-
-        return null;
+        return (('' !== $idp) && ('' !== $sp))
+            ? $this->authRegistry->getService($idp, $sp)
+            : $this->authRegistry->getDefaultService();
     }
 }

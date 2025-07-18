@@ -101,5 +101,8 @@ return (new PhpCsFixer\Config())
         'simplified_null_return' => true,
         'single_line_empty_body' => true,
         'static_lambda' => true,
+
+        // PhpUnit rules
+        'php_unit_strict' => false,
     ])
 ;

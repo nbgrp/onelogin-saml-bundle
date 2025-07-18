@@ -13,7 +13,11 @@ use Symfony\Component\HttpFoundation\Request;
 interface IdpResolverInterface
 {
     /**
-     * Returns IdP name for specified request.
+     * Returns IdP name and Sp name for specified request.
+     *
+     * @param Request $request the request to resolve IdP for
+     *
+     * @return array{idp:string, sp:string} returns an array with IdP name and Sp name if they are found, or null if not
      */
-    public function resolve(Request $request): ?string;
+    public function resolve(Request $request): array;
 }
