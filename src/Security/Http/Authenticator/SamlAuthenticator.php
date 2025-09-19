@@ -39,7 +39,7 @@ use Symfony\Component\Security\Http\EntryPoint\AuthenticationEntryPointInterface
 use Symfony\Component\Security\Http\HttpUtils;
 
 #[AutoconfigureTag('monolog.logger', ['channel' => 'security'])]
-class SamlAuthenticator implements AuthenticatorInterface, AuthenticationEntryPointInterface
+final class SamlAuthenticator implements AuthenticatorInterface, AuthenticationEntryPointInterface
 {
     public const SESSION_INDEX_ATTRIBUTE = '_saml_session_index';
     public const LAST_REQUEST_ID = '_saml_last_request_id';
@@ -58,12 +58,14 @@ class SamlAuthenticator implements AuthenticatorInterface, AuthenticationEntryPo
         private readonly bool $useProxyVars,
     ) {}
 
-    public function supports(Request $request): ?bool
+    #[\Override]
+    public function supports(Request $request): bool
     {
         return $request->isMethod('POST')
             && $this->httpUtils->checkRequestPath($request, (string) $this->options['check_path']);
     }
 
+    #[\Override]
     public function start(Request $request, ?AuthenticationException $authException = null): Response
     {
         $uri = $this->httpUtils->generateUri($request, (string) $this->options['login_path']);
@@ -75,6 +77,7 @@ class SamlAuthenticator implements AuthenticatorInterface, AuthenticationEntryPo
         return new RedirectResponse($uri);
     }
 
+    #[\Override]
     public function authenticate(Request $request): Passport
     {
         if (!$request->hasSession()) {
@@ -96,10 +99,11 @@ class SamlAuthenticator implements AuthenticatorInterface, AuthenticationEntryPo
         return $this->createPassport($oneLoginAuth);
     }
 
+    #[\Override]
     public function createToken(Passport $passport, string $firewallName): TokenInterface
     {
         if (!$passport->hasBadge(SamlAttributesBadge::class)) {
-            throw new LogicException(sprintf('Passport should contains a "%s" badge.', SamlAttributesBadge::class));
+            throw new LogicException(\sprintf('Passport should contains a "%s" badge.', SamlAttributesBadge::class));
         }
 
         $badge = $passport->getBadge(SamlAttributesBadge::class);
@@ -112,17 +116,19 @@ class SamlAuthenticator implements AuthenticatorInterface, AuthenticationEntryPo
         return new SamlToken($passport->getUser(), $firewallName, $passport->getUser()->getRoles(), $attributes);
     }
 
+    #[\Override]
     public function onAuthenticationSuccess(Request $request, TokenInterface $token, string $firewallName): ?Response
     {
         return $this->successHandler->onAuthenticationSuccess($request, $token);
     }
 
-    public function onAuthenticationFailure(Request $request, AuthenticationException $exception): ?Response
+    #[\Override]
+    public function onAuthenticationFailure(Request $request, AuthenticationException $exception): Response
     {
         return $this->failureHandler->onAuthenticationFailure($request, $exception);
     }
 
-    protected function processResponse(Auth $oneLoginAuth, SessionInterface $session): void
+    private function processResponse(Auth $oneLoginAuth, SessionInterface $session): void
     {
         $requestId = null;
         $security = $oneLoginAuth->getSettings()->getSecurityData();
@@ -134,7 +140,7 @@ class SamlAuthenticator implements AuthenticatorInterface, AuthenticationEntryPo
         $oneLoginAuth->processResponse($requestId);
     }
 
-    protected function createPassport(Auth $oneLoginAuth): Passport
+    private function createPassport(Auth $oneLoginAuth): Passport
     {
         $attributes = $this->extractAttributes($oneLoginAuth);
         $this->logger?->debug('SAML attributes extracted', $attributes);
@@ -177,7 +183,7 @@ class SamlAuthenticator implements AuthenticatorInterface, AuthenticationEntryPo
         ]);
     }
 
-    protected function extractAttributes(Auth $oneLoginAuth): array
+    private function extractAttributes(Auth $oneLoginAuth): array
     {
         $attributes = ($this->options['use_attribute_friendly_name'] ?? false) !== false
             ? $oneLoginAuth->getAttributesWithFriendlyName()
@@ -187,7 +193,7 @@ class SamlAuthenticator implements AuthenticatorInterface, AuthenticationEntryPo
         return $attributes;
     }
 
-    protected function extractIdentifier(Auth $oneLoginAuth, array $attributes): string
+    private function extractIdentifier(Auth $oneLoginAuth, array $attributes): string
     {
         if (empty($this->options['identifier_attribute'])) {
             return $oneLoginAuth->getNameId();

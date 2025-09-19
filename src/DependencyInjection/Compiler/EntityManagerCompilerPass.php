@@ -12,8 +12,9 @@ use Symfony\Component\DependencyInjection\Reference;
 /**
  * Replaces default entity manager in SAML user listeners with custom one.
  */
-class EntityManagerCompilerPass implements CompilerPassInterface
+final class EntityManagerCompilerPass implements CompilerPassInterface
 {
+    #[\Override]
     public function process(ContainerBuilder $container): void
     {
         if (!$container->hasParameter('nbgrp_onelogin_saml.entity_manager')) {

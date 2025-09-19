@@ -29,6 +29,9 @@
     <rule ref="SlevomatCodingStandard.Classes.ClassMemberSpacing" />
     <rule ref="SlevomatCodingStandard.Classes.ClassStructure">
         <properties>
+            <property name="methodGroups" type="array">
+                <element key="phpunit tests and providers" value="test*, provide*" />
+            </property>
             <property name="groups" type="array">
                 <element value="uses" />
                 <element value="enum cases" />
@@ -51,6 +54,7 @@
                 <element value="public static methods" />
                 <element value="public final methods" />
                 <element value="public methods" />
+                <element value="phpunit tests and providers" />
                 <element value="protected static abstract methods" />
                 <element value="protected abstract methods" />
                 <element value="protected static final methods" />
@@ -185,14 +189,15 @@
 
     <rule ref="SlevomatCodingStandard.TypeHints.DeclareStrictTypes">
         <properties>
-            <property name="linesCountBeforeDeclare" value="0" />
-            <property name="linesCountAfterDeclare" value="1" />
             <property name="spacesCountAroundEqualsSign" value="0" />
         </properties>
     </rule>
     <rule ref="SlevomatCodingStandard.TypeHints.DisallowArrayTypeHintSyntax">
         <properties>
-            <property name="traversableTypeHints" value="true" />
+            <property name="traversableTypeHints" type="array">
+                <element value="\ArrayIterator" />
+                <element value="\Traversable" />
+            </property>
         </properties>
     </rule>
     <rule ref="SlevomatCodingStandard.TypeHints.NullableTypeForNullDefaultValue" />

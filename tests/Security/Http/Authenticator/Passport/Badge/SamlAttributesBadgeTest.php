@@ -16,6 +16,15 @@ use PHPUnit\Framework\TestCase;
 #[CoversClass(SamlAttributesBadge::class)]
 final class SamlAttributesBadgeTest extends TestCase
 {
+    #[DataProvider('provideBadgeCases')]
+    public function testBadge(array $attributes): void
+    {
+        $badge = new SamlAttributesBadge($attributes);
+
+        self::assertSame($attributes, $badge->getAttributes());
+        self::assertTrue($badge->isResolved());
+    }
+
     public static function provideBadgeCases(): iterable
     {
         yield 'Empty attributes' => [
@@ -28,14 +37,5 @@ final class SamlAttributesBadgeTest extends TestCase
                 'email' => 'tester@example.com',
             ],
         ];
-    }
-
-    #[DataProvider('provideBadgeCases')]
-    public function testBadge(array $attributes): void
-    {
-        $badge = new SamlAttributesBadge($attributes);
-
-        self::assertSame($attributes, $badge->getAttributes());
-        self::assertTrue($badge->isResolved());
     }
 }

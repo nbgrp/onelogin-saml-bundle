@@ -10,7 +10,7 @@ use Symfony\Component\Security\Http\Authenticator\Passport\Badge\BadgeInterface;
 /**
  * Allows to add SAML attributes to a passport.
  */
-readonly class SamlAttributesBadge implements BadgeInterface
+final readonly class SamlAttributesBadge implements BadgeInterface
 {
     public function __construct(
         private array $attributes,
@@ -21,6 +21,7 @@ readonly class SamlAttributesBadge implements BadgeInterface
         return $this->attributes;
     }
 
+    #[\Override]
     public function isResolved(): bool
     {
         return true;

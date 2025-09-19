@@ -11,7 +11,7 @@ use Symfony\Contracts\EventDispatcher\Event;
 /**
  * A tricky badge for deferred user creation/modification event dispatching by a firewall-specific event dispatcher.
  */
-class DeferredEventBadge implements BadgeInterface
+final class DeferredEventBadge implements BadgeInterface
 {
     private ?Event $event = null;
     private bool $resolved = false;
@@ -30,6 +30,7 @@ class DeferredEventBadge implements BadgeInterface
         }
     }
 
+    #[\Override]
     public function isResolved(): bool
     {
         return $this->resolved;

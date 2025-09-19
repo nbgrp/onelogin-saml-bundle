@@ -16,7 +16,7 @@ use Symfony\Component\HttpKernel\Exception\ServiceUnavailableHttpException;
 use Symfony\Component\Security\Http\SecurityRequestAttributes;
 
 #[AsController]
-readonly class Login
+final readonly class Login
 {
     public function __construct(
         private FirewallMap $firewallMap,
@@ -47,7 +47,7 @@ readonly class Login
         return new RedirectResponse($this->processLoginAndGetRedirectUrl($auth, $targetPath, $session));
     }
 
-    /** @psalm-suppress MixedInferredReturnType, MixedReturnStatement */
+    /** @psalm-suppress MixedReturnStatement */
     private function getTargetPath(Request $request, SessionInterface $session): ?string
     {
         $firewallName = $this->firewallMap->getFirewallConfig($request)?->getName();

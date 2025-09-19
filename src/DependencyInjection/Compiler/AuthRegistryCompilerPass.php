@@ -16,8 +16,9 @@ use Symfony\Component\DependencyInjection\Reference;
 /**
  * Initialize AuthRegistry with Auth services according OneLogin settings.
  */
-class AuthRegistryCompilerPass implements CompilerPassInterface
+final class AuthRegistryCompilerPass implements CompilerPassInterface
 {
+    #[\Override]
     public function process(ContainerBuilder $container): void
     {
         $authRegistry = $container->getDefinition(AuthRegistryInterface::class);

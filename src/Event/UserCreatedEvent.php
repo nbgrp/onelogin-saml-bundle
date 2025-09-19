@@ -5,4 +5,4 @@ declare(strict_types=1);
 
 namespace Nbgrp\OneloginSamlBundle\Event;
 
-class UserCreatedEvent extends AbstractUserEvent {}
+final class UserCreatedEvent extends AbstractUserEvent {}

@@ -26,31 +26,6 @@ use Symfony\Component\Security\Http\SecurityRequestAttributes;
 #[CoversClass(Login::class)]
 final class LoginTest extends TestCase
 {
-    public static function provideErrorExceptionCases(): iterable
-    {
-        yield 'From attributes' => [
-            'request' => (static function () {
-                $request = Request::create('/login');
-                $request->attributes->set(SecurityRequestAttributes::AUTHENTICATION_ERROR, new \Exception('Error from attributes'));
-
-                return $request;
-            })(),
-            'expectedMessage' => 'Error from attributes',
-        ];
-
-        yield 'From session' => [
-            'request' => (static function () {
-                $request = Request::create('/login');
-                $session = new Session(new MockArraySessionStorage());
-                $session->set(SecurityRequestAttributes::AUTHENTICATION_ERROR, new \Exception('Error from session'));
-                $request->setSession($session);
-
-                return $request;
-            })(),
-            'expectedMessage' => 'Error from session',
-        ];
-    }
-
     public function testInvokeWithRejectUnsolicitedResponsesWithInResponseTo(): void
     {
         $firewallMap = self::createStub(FirewallMap::class);
@@ -147,6 +122,31 @@ final class LoginTest extends TestCase
         $this->expectException(\RuntimeException::class);
         $this->expectExceptionMessage($expectedMessage);
         $controller($request, $auth);
+    }
+
+    public static function provideErrorExceptionCases(): iterable
+    {
+        yield 'From attributes' => [
+            'request' => (static function () {
+                $request = Request::create('/login');
+                $request->attributes->set(SecurityRequestAttributes::AUTHENTICATION_ERROR, new \Exception('Error from attributes'));
+
+                return $request;
+            })(),
+            'expectedMessage' => 'Error from attributes',
+        ];
+
+        yield 'From session' => [
+            'request' => (static function () {
+                $request = Request::create('/login');
+                $session = new Session(new MockArraySessionStorage());
+                $session->set(SecurityRequestAttributes::AUTHENTICATION_ERROR, new \Exception('Error from session'));
+                $request->setSession($session);
+
+                return $request;
+            })(),
+            'expectedMessage' => 'Error from session',
+        ];
     }
 
     public function testUnknownFirewallException(): void

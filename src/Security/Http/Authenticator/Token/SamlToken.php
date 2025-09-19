@@ -8,7 +8,7 @@ namespace Nbgrp\OneloginSamlBundle\Security\Http\Authenticator\Token;
 use Symfony\Component\Security\Core\User\UserInterface;
 use Symfony\Component\Security\Http\Authenticator\Token\PostAuthenticationToken;
 
-class SamlToken extends PostAuthenticationToken
+final class SamlToken extends PostAuthenticationToken
 {
     /**
      * @param array<string> $roles

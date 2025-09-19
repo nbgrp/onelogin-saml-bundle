@@ -22,7 +22,7 @@ class Configuration implements ConfigurationInterface
         $rootNode = $treeBuilder->getRootNode();
 
         // @formatter:off
-        /** @phpstan-ignore-next-line */
+        // @phpstan-ignore-next-line
         $rootNode
             ->info('nb:group OneLogin PHP Symfony Bundle configuration')
             ->children()
@@ -174,6 +174,7 @@ class Configuration implements ConfigurationInterface
                                             ->thenInvalid('must be an array or a boolean.')
                                         ->end()
                                         ->validate()
+                                            // @phpstan-ignore-next-line
                                             ->ifTrue(static fn ($value) => \is_array($value) && array_filter($value, static fn ($item): bool => !str_starts_with($item, 'urn:oasis:names:tc:SAML:2.0:ac:classes:')))
                                             ->thenInvalid('invalid value.')
                                         ->end()

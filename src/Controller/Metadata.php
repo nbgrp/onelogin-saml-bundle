@@ -10,7 +10,7 @@ use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpKernel\Attribute\AsController;
 
 #[AsController]
-class Metadata
+final class Metadata
 {
     public function __invoke(Auth $auth): Response
     {
