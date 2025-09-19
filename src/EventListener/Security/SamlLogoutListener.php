@@ -27,13 +27,13 @@ final class SamlLogoutListener
     #[AsEventListener(LogoutEvent::class)]
     public function processSingleLogout(LogoutEvent $event): void
     {
-        $authService = $this->getAuthService($event->getRequest());
-        if (!$authService) {
+        $token = $event->getToken();
+        if (!$token instanceof SamlToken) {
             return;
         }
 
-        $token = $event->getToken();
-        if (!$token instanceof SamlToken) {
+        $authService = $this->getAuthService($event->getRequest());
+        if (!$authService) {
             return;
         }
 
