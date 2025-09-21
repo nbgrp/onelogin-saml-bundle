@@ -14,6 +14,7 @@ final class AuthRegistry implements AuthRegistryInterface
      */
     private array $services = [];
 
+    #[\Override]
     public function addService(string $key, Auth $auth): self
     {
         if (\array_key_exists($key, $this->services)) {
@@ -25,16 +26,19 @@ final class AuthRegistry implements AuthRegistryInterface
         return $this;
     }
 
+    #[\Override]
     public function hasService(string $key): bool
     {
         return \array_key_exists($key, $this->services);
     }
 
+    #[\Override]
     public function getService(string $key): Auth
     {
         return $this->services[$key] ?? throw new \OutOfBoundsException('Auth service for key "'.$key.'" does not exists.');
     }
 
+    #[\Override]
     public function getDefaultService(): Auth
     {
         if (empty($this->services)) {

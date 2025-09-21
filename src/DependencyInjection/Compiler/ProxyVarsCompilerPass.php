@@ -19,6 +19,7 @@ trigger_deprecation('nbgrp/onelogin-saml-bundle', '1.2', 'The "%s" class is depr
  */
 class ProxyVarsCompilerPass implements CompilerPassInterface
 {
+    #[\Override]
     public function process(ContainerBuilder $container): void
     {
         $useProxyVars = $container->getParameter('nbgrp_onelogin_saml.use_proxy_vars');

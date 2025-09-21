@@ -33,27 +33,30 @@ final class SamlLogoutListener
         }
 
         $authService = $this->getAuthService($event->getRequest());
-        if (!$authService) {
+        if ($authService === null) {
             return;
         }
 
         try {
             $authService->processSLO();
         } catch (\OneLogin\Saml2\Error) {
-            if (!empty($authService->getSLOurl())) {
-                /** @var string|null $sessionIndex */
-                $sessionIndex = $token->hasAttribute(SamlAuthenticator::SESSION_INDEX_ATTRIBUTE)
-                    ? $token->getAttribute(SamlAuthenticator::SESSION_INDEX_ATTRIBUTE)
-                    : null;
-                $authService->logout(null, [], $token->getUserIdentifier(), $sessionIndex);
+            $sloUrl = $authService->getSLOurl();
+            if ($sloUrl === null || $sloUrl === '') {
+                return;
             }
+
+            /** @var string|null $sessionIndex */
+            $sessionIndex = $token->hasAttribute(SamlAuthenticator::SESSION_INDEX_ATTRIBUTE)
+                ? $token->getAttribute(SamlAuthenticator::SESSION_INDEX_ATTRIBUTE)
+                : null;
+            $authService->logout(null, [], $token->getUserIdentifier(), $sessionIndex);
         }
     }
 
     private function getAuthService(Request $request): ?Auth
     {
         $idp = $this->idpResolver->resolve($request);
-        if (!$idp) {
+        if ($idp === null || $idp === '') {
             return $this->authRegistry->getDefaultService();
         }
 

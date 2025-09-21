@@ -13,6 +13,7 @@ final class IdpResolver implements IdpResolverInterface
         private readonly string $idpParameterName,
     ) {}
 
+    #[\Override]
     public function resolve(Request $request): ?string
     {
         if ($request->query->has($this->idpParameterName)) {

@@ -97,6 +97,7 @@ nbgrp_onelogin_saml:
                 wantNameId: false
                 wantNameIdEncrypted: false
                 requestedAuthnContext: true
+                requestedAuthnContextComparison: 'exact'
                 wantXMLValidation: false
                 relaxDestinationValidation: false
                 destinationStrictlyMatches: true

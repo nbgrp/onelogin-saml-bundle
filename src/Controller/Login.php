@@ -47,11 +47,11 @@ class Login
         return new RedirectResponse($this->processLoginAndGetRedirectUrl($auth, $targetPath, $session));
     }
 
-    /** @psalm-suppress MixedInferredReturnType, MixedReturnStatement */
+    /** @psalm-suppress MixedReturnStatement */
     private function getTargetPath(Request $request, SessionInterface $session): ?string
     {
         $firewallName = $this->firewallMap->getFirewallConfig($request)?->getName();
-        if (!$firewallName) {
+        if ($firewallName === null || $firewallName === '') {
             throw new ServiceUnavailableHttpException(message: 'Unknown firewall.');
         }
 
@@ -62,15 +62,13 @@ class Login
     private function processLoginAndGetRedirectUrl(Auth $auth, ?string $targetPath, ?SessionInterface $session): string
     {
         $redirectUrl = $auth->login(returnTo: $targetPath, stay: true);
-        if ($redirectUrl === null) {
-            throw new \RuntimeException('Login cannot be performed: Auth did not returned redirect url.');
-        }
 
         $security = $auth->getSettings()->getSecurityData();
-        if (($security['rejectUnsolicitedResponsesWithInResponseTo'] ?? false) && $session instanceof SessionInterface) {
+        if (($security['rejectUnsolicitedResponsesWithInResponseTo'] ?? false) !== false && $session instanceof SessionInterface) {
             $session->set(SamlAuthenticator::LAST_REQUEST_ID, $auth->getLastRequestID());
         }
 
+        // @phan-suppress-next-line PhanPossiblyNullTypeReturn
         return $redirectUrl;
     }
 }

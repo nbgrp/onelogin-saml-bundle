@@ -150,30 +150,6 @@ final class LoginTest extends TestCase
         ];
     }
 
-    public function testAuthLoginWithoutRedirectUrlException(): void
-    {
-        $firewallMap = $this->createMock(FirewallMap::class);
-        $firewallMap
-            ->method('getFirewallConfig')
-            ->willReturn(new FirewallConfig('foo', 'bar'))
-        ;
-
-        $auth = $this->createMock(Auth::class);
-        $auth
-            ->method('login')
-            ->willReturn(null)
-        ;
-
-        $request = Request::create('/login');
-        $request->setSession(new Session(new MockArraySessionStorage()));
-
-        $controller = new Login($firewallMap);
-
-        $this->expectException(\RuntimeException::class);
-        $this->expectExceptionMessage('Login cannot be performed: Auth did not returned redirect url.');
-        $controller($request, $auth);
-    }
-
     public function testUnknownFirewallException(): void
     {
         $firewallMap = $this->createMock(FirewallMap::class);

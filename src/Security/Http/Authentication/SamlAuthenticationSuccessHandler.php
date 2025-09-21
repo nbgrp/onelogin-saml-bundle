@@ -18,6 +18,7 @@ class SamlAuthenticationSuccessHandler extends DefaultAuthenticationSuccessHandl
     public const RELAY_STATE = 'RelayState';
 
     /** @psalm-suppress MixedArrayAccess */
+    #[\Override]
     protected function determineTargetUrl(Request $request): string
     {
         if ($this->options['always_use_default_target_path']) {

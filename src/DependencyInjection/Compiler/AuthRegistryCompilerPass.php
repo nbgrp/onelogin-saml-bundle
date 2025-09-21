@@ -18,6 +18,7 @@ use Symfony\Component\DependencyInjection\Reference;
  */
 class AuthRegistryCompilerPass implements CompilerPassInterface
 {
+    #[\Override]
     public function process(ContainerBuilder $container): void
     {
         $authRegistry = $container->getDefinition(AuthRegistryInterface::class);

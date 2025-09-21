@@ -12,18 +12,18 @@ return (new PhpCsFixer\Config())
                 'src/DependencyInjection/Configuration.php',
                 'src/DependencyInjection/Security/UserProvider/SamlUserProviderFactory.php',
                 'src/Resources/config/services.php',
-            ])
+            ]),
     )
     ->setRiskyAllowed(true)
     ->setRules([
         // base presets
-        '@PER' => true,
+        '@PER-CS' => true,
         '@PhpCsFixer' => true,
         '@Symfony' => true,
         '@PHP81Migration' => true,
 
         // risky presets
-        '@PER:risky' => true,
+        '@PER-CS:risky' => true,
         '@PhpCsFixer:risky' => true,
         '@Symfony:risky' => true,
         '@PHP80Migration:risky' => true,
@@ -31,10 +31,12 @@ return (new PhpCsFixer\Config())
         // presets tuning
         'blank_line_after_opening_tag' => false,
         'blank_line_before_statement' => [
-            'statements' => ['case', 'default', 'return', 'throw', 'try'],
+            'statements' => ['case', 'default', 'declare', 'return', 'throw', 'try'],
         ],
         'comment_to_phpdoc' => [
             'ignored_tags' => [
+                'phan-suppress-current-line',
+                'phan-suppress-next-line',
                 'see',
                 'todo',
             ],
@@ -72,6 +74,15 @@ return (new PhpCsFixer\Config())
                 'const',
                 'class',
                 'function',
+            ],
+        ],
+        'php_unit_data_provider_static' => false,
+        'php_unit_test_case_static_method_calls' => false,
+        'phpdoc_order' => [
+            'order' => [
+                'param',
+                'throws',
+                'return',
             ],
         ],
         'phpdoc_separation' => false,

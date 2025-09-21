@@ -58,23 +58,26 @@ class SamlAuthenticator implements AuthenticatorInterface, AuthenticationEntryPo
         private readonly bool $useProxyVars,
     ) {}
 
+    #[\Override]
     public function supports(Request $request): ?bool
     {
         return $request->isMethod('POST')
             && $this->httpUtils->checkRequestPath($request, (string) $this->options['check_path']);
     }
 
+    #[\Override]
     public function start(Request $request, ?AuthenticationException $authException = null): Response
     {
         $uri = $this->httpUtils->generateUri($request, (string) $this->options['login_path']);
         $idp = $this->idpResolver->resolve($request);
-        if ($idp) {
+        if ($idp !== null && $idp !== '') {
             $uri .= '?'.$this->idpParameterName.'='.$idp;
         }
 
         return new RedirectResponse($uri);
     }
 
+    #[\Override]
     public function authenticate(Request $request): Passport
     {
         if (!$request->hasSession()) {
@@ -96,10 +99,11 @@ class SamlAuthenticator implements AuthenticatorInterface, AuthenticationEntryPo
         return $this->createPassport($oneLoginAuth);
     }
 
+    #[\Override]
     public function createToken(Passport $passport, string $firewallName): TokenInterface
     {
         if (!$passport->hasBadge(SamlAttributesBadge::class)) {
-            throw new LogicException(sprintf('Passport should contains a "%s" badge.', SamlAttributesBadge::class));
+            throw new LogicException(\sprintf('Passport should contains a "%s" badge.', SamlAttributesBadge::class));
         }
 
         $badge = $passport->getBadge(SamlAttributesBadge::class);
@@ -112,11 +116,13 @@ class SamlAuthenticator implements AuthenticatorInterface, AuthenticationEntryPo
         return new SamlToken($passport->getUser(), $firewallName, $passport->getUser()->getRoles(), $attributes);
     }
 
+    #[\Override]
     public function onAuthenticationSuccess(Request $request, TokenInterface $token, string $firewallName): ?Response
     {
         return $this->successHandler->onAuthenticationSuccess($request, $token);
     }
 
+    #[\Override]
     public function onAuthenticationFailure(Request $request, AuthenticationException $exception): ?Response
     {
         return $this->failureHandler->onAuthenticationFailure($request, $exception);
@@ -126,7 +132,7 @@ class SamlAuthenticator implements AuthenticatorInterface, AuthenticationEntryPo
     {
         $requestId = null;
         $security = $oneLoginAuth->getSettings()->getSecurityData();
-        if ($security['rejectUnsolicitedResponsesWithInResponseTo'] ?? false) {
+        if (($security['rejectUnsolicitedResponsesWithInResponseTo'] ?? false) !== false) {
             /** @var string $requestId */
             $requestId = $session->get(self::LAST_REQUEST_ID);
         }
@@ -179,7 +185,7 @@ class SamlAuthenticator implements AuthenticatorInterface, AuthenticationEntryPo
 
     protected function extractAttributes(Auth $oneLoginAuth): array
     {
-        $attributes = $this->options['use_attribute_friendly_name'] ?? false
+        $attributes = ($this->options['use_attribute_friendly_name'] ?? false) !== false
             ? $oneLoginAuth->getAttributesWithFriendlyName()
             : $oneLoginAuth->getAttributes();
         $attributes[self::SESSION_INDEX_ATTRIBUTE] = $oneLoginAuth->getSessionIndex();
@@ -215,7 +221,7 @@ class SamlAuthenticator implements AuthenticatorInterface, AuthenticationEntryPo
     {
         try {
             $idp = $this->idpResolver->resolve($request);
-            $authService = $idp
+            $authService = ($idp !== null && $idp !== '')
                 ? $this->authRegistry->getService($idp)
                 : $this->authRegistry->getDefaultService();
         } catch (\RuntimeException $exception) {
