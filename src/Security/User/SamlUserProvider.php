@@ -12,7 +12,7 @@ use Symfony\Component\Security\Core\User\UserProviderInterface;
 /**
  * Just instantiates user object with providing identifier and default roles.
  *
- * @template-covariant TUser of UserInterface
+ * @template TUser of UserInterface
  *
  * @template-implements UserProviderInterface<TUser>
  */
@@ -30,11 +30,13 @@ class SamlUserProvider implements UserProviderInterface
         }
     }
 
+    #[\Override]
     public function loadUserByIdentifier(string $identifier): UserInterface
     {
         return new $this->userClass($identifier, $this->defaultRoles);
     }
 
+    #[\Override]
     public function refreshUser(UserInterface $user): UserInterface
     {
         if (!$user instanceof $this->userClass) {
@@ -44,6 +46,7 @@ class SamlUserProvider implements UserProviderInterface
         return $user;
     }
 
+    #[\Override]
     public function supportsClass(string $class): bool
     {
         return is_a($class, $this->userClass, true);

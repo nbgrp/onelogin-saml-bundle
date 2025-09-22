@@ -14,6 +14,7 @@ use Symfony\Component\Security\Core\User\UserInterface;
 
 class SamlUserProviderFactory implements UserProviderFactoryInterface
 {
+    #[\Override]
     public function create(ContainerBuilder $container, string $id, array $config): void
     {
         $container
@@ -23,6 +24,7 @@ class SamlUserProviderFactory implements UserProviderFactoryInterface
         ;
     }
 
+    #[\Override]
     public function getKey(): string
     {
         return 'saml';
@@ -31,17 +33,18 @@ class SamlUserProviderFactory implements UserProviderFactoryInterface
     /**
      * @suppress PhanUndeclaredMethod
      */
+    #[\Override]
     public function addConfiguration(NodeDefinition $builder): void
     {
         // @formatter:off
-        /** @phpstan-ignore-next-line */
+        // @phpstan-ignore-next-line
         $builder
             ->children()
                 ->scalarNode('user_class')
                     ->isRequired()
                     ->cannotBeEmpty()
                     ->validate()
-                        ->ifTrue(static fn ($value) => !is_a($value, UserInterface::class, true))
+                        ->ifTrue(static fn ($value) => !is_a((string) $value, UserInterface::class, true))
                         ->thenInvalid('You should provide user class implementing '.UserInterface::class.' interface.')
                     ->end()
                 ->end()

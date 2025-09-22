@@ -69,8 +69,10 @@
             <property name="modifiersOrder" type="array">
                 <element value="var" />
                 <element value="public, protected, private" />
-                <element value="static" />
+                <element value="static, readonly" />
             </property>
+            <property name="checkPromoted" value="true" />
+            <property name="enableMultipleSpacesBetweenModifiersCheck" value="true" />
         </properties>
     </rule>
     <rule ref="SlevomatCodingStandard.Classes.RequireConstructorPropertyPromotion" />
@@ -183,14 +185,15 @@
 
     <rule ref="SlevomatCodingStandard.TypeHints.DeclareStrictTypes">
         <properties>
-            <property name="linesCountBeforeDeclare" value="0" />
-            <property name="linesCountAfterDeclare" value="1" />
             <property name="spacesCountAroundEqualsSign" value="0" />
         </properties>
     </rule>
     <rule ref="SlevomatCodingStandard.TypeHints.DisallowArrayTypeHintSyntax">
         <properties>
-            <property name="traversableTypeHints" value="true" />
+            <property name="traversableTypeHints" type="array">
+                <element value="\ArrayIterator" />
+                <element value="\Traversable" />
+            </property>
         </properties>
     </rule>
     <rule ref="SlevomatCodingStandard.TypeHints.NullableTypeForNullDefaultValue" />

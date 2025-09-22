@@ -22,7 +22,7 @@ class Configuration implements ConfigurationInterface
         $rootNode = $treeBuilder->getRootNode();
 
         // @formatter:off
-        /** @phpstan-ignore-next-line */
+        // @phpstan-ignore-next-line
         $rootNode
             ->info('nb:group OneLogin PHP Symfony Bundle configuration')
             ->children()
@@ -51,7 +51,7 @@ class Configuration implements ConfigurationInterface
                                             ->end()
                                             ->scalarNode('binding')
                                                 ->validate()
-                                                    ->ifTrue(static fn ($value): bool => !str_starts_with($value, 'urn:oasis:names:tc:SAML:2.0:bindings:'))
+                                                    ->ifTrue(static fn ($value): bool => !str_starts_with((string) $value, 'urn:oasis:names:tc:SAML:2.0:bindings:'))
                                                     ->thenInvalid('invalid value.')
                                                 ->end()
                                             ->end()
@@ -63,7 +63,7 @@ class Configuration implements ConfigurationInterface
                                             ->scalarNode('responseUrl')->end()
                                             ->scalarNode('binding')
                                                 ->validate()
-                                                    ->ifTrue(static fn ($value): bool => !str_starts_with($value, 'urn:oasis:names:tc:SAML:2.0:bindings:'))
+                                                    ->ifTrue(static fn ($value): bool => !str_starts_with((string) $value, 'urn:oasis:names:tc:SAML:2.0:bindings:'))
                                                     ->thenInvalid('invalid value.')
                                                 ->end()
                                             ->end()
@@ -100,7 +100,7 @@ class Configuration implements ConfigurationInterface
                                             ->end()
                                             ->scalarNode('binding')
                                                 ->validate()
-                                                    ->ifTrue(static fn ($value): bool => !str_starts_with($value, 'urn:oasis:names:tc:SAML:2.0:bindings:'))
+                                                    ->ifTrue(static fn ($value): bool => !str_starts_with((string) $value, 'urn:oasis:names:tc:SAML:2.0:bindings:'))
                                                     ->thenInvalid('invalid value.')
                                                 ->end()
                                             ->end()
@@ -133,7 +133,7 @@ class Configuration implements ConfigurationInterface
                                             ->end()
                                             ->scalarNode('binding')
                                                 ->validate()
-                                                    ->ifTrue(static fn ($value): bool => !str_starts_with($value, 'urn:oasis:names:tc:SAML:2.0:bindings:'))
+                                                    ->ifTrue(static fn ($value): bool => !str_starts_with((string) $value, 'urn:oasis:names:tc:SAML:2.0:bindings:'))
                                                     ->thenInvalid('invalid value.')
                                                 ->end()
                                             ->end()
@@ -141,7 +141,7 @@ class Configuration implements ConfigurationInterface
                                     ->end()
                                     ->scalarNode('NameIDFormat')
                                         ->validate()
-                                            ->ifTrue(static fn ($value): bool => !(str_starts_with($value, 'urn:oasis:names:tc:SAML:1.1:nameid-format:') || str_starts_with($value, 'urn:oasis:names:tc:SAML:2.0:nameid-format:')))
+                                            ->ifTrue(static fn ($value): bool => !(str_starts_with((string) $value, 'urn:oasis:names:tc:SAML:1.1:nameid-format:') || str_starts_with((string) $value, 'urn:oasis:names:tc:SAML:2.0:nameid-format:')))
                                             ->thenInvalid('invalid value.')
                                         ->end()
                                     ->end()
@@ -174,9 +174,18 @@ class Configuration implements ConfigurationInterface
                                             ->thenInvalid('must be an array or a boolean.')
                                         ->end()
                                         ->validate()
-                                            ->ifTrue(static fn ($value) => \is_array($value) && array_filter($value, static fn ($item): bool => !str_starts_with($item, 'urn:oasis:names:tc:SAML:2.0:ac:classes:')))
+                                            // @phpstan-ignore-next-line
+                                            ->ifTrue(static fn ($value) => \is_array($value) && array_filter($value, static fn ($item): bool => !str_starts_with((string) $item, 'urn:oasis:names:tc:SAML:2.0:ac:classes:')))
                                             ->thenInvalid('invalid value.')
                                         ->end()
+                                    ->end()
+                                    ->enumNode('requestedAuthnContextComparison')
+                                        ->values([
+                                            'exact',
+                                            'minimum',
+                                            'maximum',
+                                            'better',
+                                        ])
                                     ->end()
                                     ->booleanNode('wantXMLValidation')->end()
                                     ->booleanNode('relaxDestinationValidation')->end()
@@ -285,8 +294,8 @@ class Configuration implements ConfigurationInterface
                             ->end()
                         ->end()
                         ->validate()
-                            ->ifTrue(static fn ($value): bool => empty($value['organization']))
-                            ->then(static fn ($value): array => array_diff_key($value, ['organization' => null]))
+                            ->ifTrue(static fn (array $value): bool => empty($value['organization']))
+                            ->then(static fn (array $value): array => array_diff_key($value, ['organization' => null]))
                         ->end()
                     ->end()
                 ->end()
