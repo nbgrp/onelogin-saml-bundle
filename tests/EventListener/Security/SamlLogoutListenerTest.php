@@ -27,6 +27,26 @@ use Symfony\Component\Security\Http\Event\LogoutEvent;
 #[CoversClass(SamlLogoutListener::class)]
 final class SamlLogoutListenerTest extends TestCase
 {
+    /**
+     * @param callable(TestCase): AuthRegistryInterface $authRegistry
+     */
+    #[DataProvider('provideCases')]
+    public function test(callable $authRegistry, IdpResolverInterface $ipdResolver, Request $request, ?TokenInterface $token): void
+    {
+        $event = $this->createMock(LogoutEvent::class);
+        $event
+            ->method('getRequest')
+            ->willReturn($request)
+        ;
+        $event
+            ->expects(self::once())
+            ->method('getToken')
+            ->willReturn($token)
+        ;
+
+        (new SamlLogoutListener($authRegistry($this), $ipdResolver))->processSingleLogout($event);
+    }
+
     public static function provideCases(): iterable
     {
         yield 'No Auth service' => [
@@ -116,25 +136,5 @@ final class SamlLogoutListenerTest extends TestCase
             'request' => Request::create('/logout'),
             'token' => new SamlToken(new TestUser('tester'), 'foo', [], [SamlAuthenticator::SESSION_INDEX_ATTRIBUTE => 'session_index']),
         ];
-    }
-
-    /**
-     * @param callable(TestCase): AuthRegistryInterface $authRegistry
-     */
-    #[DataProvider('provideCases')]
-    public function test(callable $authRegistry, IdpResolverInterface $ipdResolver, Request $request, ?TokenInterface $token): void
-    {
-        $event = $this->createMock(LogoutEvent::class);
-        $event
-            ->method('getRequest')
-            ->willReturn($request)
-        ;
-        $event
-            ->expects(self::once())
-            ->method('getToken')
-            ->willReturn($token)
-        ;
-
-        (new SamlLogoutListener($authRegistry($this), $ipdResolver))->processSingleLogout($event);
     }
 }

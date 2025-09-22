@@ -47,7 +47,7 @@ readonly class Login
         return new RedirectResponse($this->processLoginAndGetRedirectUrl($auth, $targetPath, $session));
     }
 
-    /** @psalm-suppress MixedInferredReturnType, MixedReturnStatement */
+    /** @psalm-suppress MixedReturnStatement */
     private function getTargetPath(Request $request, SessionInterface $session): ?string
     {
         $firewallName = $this->firewallMap->getFirewallConfig($request)?->getName();

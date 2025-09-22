@@ -27,6 +27,30 @@ use Symfony\Component\Security\Core\User\UserInterface;
 #[CoversClass(UserModifiedListener::class)]
 final class UserListenersTest extends TestCase
 {
+    /**
+     * @param callable(TestCase): EntityManagerInterface $entityManager
+     */
+    #[DataProvider('provideUserListenerCases')]
+    public function testUserCreatedListener(
+        callable $entityManager,
+        bool $needPersist,
+        UserInterface $user,
+    ): void {
+        (new UserCreatedListener($entityManager($this), $needPersist))(new UserCreatedEvent($user));
+    }
+
+    /**
+     * @param callable(TestCase): EntityManagerInterface $entityManager
+     */
+    #[DataProvider('provideUserListenerCases')]
+    public function testUserModifiedListener(
+        callable $entityManager,
+        bool $needPersist,
+        UserInterface $user,
+    ): void {
+        (new UserModifiedListener($entityManager($this), $needPersist))(new UserModifiedEvent($user));
+    }
+
     public static function provideUserListenerCases(): iterable
     {
         yield 'needPersist false' => [
@@ -66,29 +90,5 @@ final class UserListenersTest extends TestCase
             'needPersist' => true,
             'user' => $user,
         ];
-    }
-
-    /**
-     * @param callable(TestCase): EntityManagerInterface $entityManager
-     */
-    #[DataProvider('provideUserListenerCases')]
-    public function testUserCreatedListener(
-        callable $entityManager,
-        bool $needPersist,
-        UserInterface $user,
-    ): void {
-        (new UserCreatedListener($entityManager($this), $needPersist))(new UserCreatedEvent($user));
-    }
-
-    /**
-     * @param callable(TestCase): EntityManagerInterface $entityManager
-     */
-    #[DataProvider('provideUserListenerCases')]
-    public function testUserModifiedListener(
-        callable $entityManager,
-        bool $needPersist,
-        UserInterface $user,
-    ): void {
-        (new UserModifiedListener($entityManager($this), $needPersist))(new UserModifiedEvent($user));
     }
 }

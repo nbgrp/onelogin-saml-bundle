@@ -4,5 +4,10 @@ parameters:
     - src
     - tests
 
-  checkMissingIterableValueType: false
-  checkGenericClassInNonGenericObjectType: false
+  treatPhpDocTypesAsCertain: false
+
+  ignoreErrors:
+    -
+      identifier: missingType.iterableValue
+    -
+      identifier: missingType.generics

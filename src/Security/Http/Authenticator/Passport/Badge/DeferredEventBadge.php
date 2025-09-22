@@ -30,6 +30,7 @@ class DeferredEventBadge implements BadgeInterface
         }
     }
 
+    #[\Override]
     public function isResolved(): bool
     {
         return $this->resolved;

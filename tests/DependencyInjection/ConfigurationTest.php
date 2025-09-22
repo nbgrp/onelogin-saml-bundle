@@ -20,6 +20,12 @@ final class ConfigurationTest extends TestCase
 {
     private Processor $processor;
 
+    #[DataProvider('provideValidConfigCases')]
+    public function testValidConfig(array $config, array $expected): void
+    {
+        self::assertSame($expected, $this->processor->processConfiguration(new Configuration(), [$config]));
+    }
+
     public static function provideValidConfigCases(): iterable
     {
         yield 'Simple configuration' => [
@@ -294,6 +300,14 @@ final class ConfigurationTest extends TestCase
                 'entity_manager_name' => 'custom-em',
             ],
         ];
+    }
+
+    #[DataProvider('provideConfigWithInvalidOneLoginSettingsExceptionCases')]
+    public function testConfigWithInvalidOneLoginSettingsException(array $config, string $expectedMessage): void
+    {
+        $this->expectException(InvalidConfigurationException::class);
+        $this->expectExceptionMessage($expectedMessage);
+        $this->processor->processConfiguration(new Configuration(), [$config]);
     }
 
     public static function provideConfigWithInvalidOneLoginSettingsExceptionCases(): iterable
@@ -700,20 +714,6 @@ final class ConfigurationTest extends TestCase
             ],
             'expectedMessage' => 'The path "nbgrp_onelogin_saml.entity_manager_name" cannot contain an empty value, but got "".',
         ];
-    }
-
-    #[DataProvider('provideValidConfigCases')]
-    public function testValidConfig(array $config, array $expected): void
-    {
-        self::assertSame($expected, $this->processor->processConfiguration(new Configuration(), [$config]));
-    }
-
-    #[DataProvider('provideConfigWithInvalidOneLoginSettingsExceptionCases')]
-    public function testConfigWithInvalidOneLoginSettingsException(array $config, string $expectedMessage): void
-    {
-        $this->expectException(InvalidConfigurationException::class);
-        $this->expectExceptionMessage($expectedMessage);
-        $this->processor->processConfiguration(new Configuration(), [$config]);
     }
 
     protected function setUp(): void

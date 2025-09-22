@@ -11,19 +11,24 @@ use Symfony\Component\Security\Http\Authentication\DefaultAuthenticationSuccessH
 /**
  * Returns value of RelayState request parameter (GET or POST) as target url
  * (if it does not equal to the login path).
+ *
+ * @api
  */
 class SamlAuthenticationSuccessHandler extends DefaultAuthenticationSuccessHandler
 {
     public const RELAY_STATE = 'RelayState';
 
+    #[\Override]
     protected function determineTargetUrl(Request $request): string
     {
         if ($this->options['always_use_default_target_path']) {
             return (string) $this->options['default_target_path'];
         }
 
+        /** @psalm-suppress InvalidArgument */
         $relayState = $request->query->get(self::RELAY_STATE, $request->request->get(self::RELAY_STATE));
         if ($relayState !== null) {
+            /** @psalm-suppress RedundantCastGivenDocblockType */
             $relayState = (string) $relayState;
             if ($relayState !== $this->httpUtils->generateUri($request, (string) $this->options['login_path'])) {
                 return $relayState;

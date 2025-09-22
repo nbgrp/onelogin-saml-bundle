@@ -17,6 +17,17 @@ use PHPUnit\Framework\TestCase;
 #[CoversClass(SamlToken::class)]
 final class SamlTokenTest extends TestCase
 {
+    #[DataProvider('provideTokenCases')]
+    public function testToken(array $attributes): void
+    {
+        $user = new TestUser('tester');
+        $token = new SamlToken($user, 'fwname', ['ROLE_USER', 'ROLE_EXTRA'], $attributes);
+
+        self::assertSame($token->getUserIdentifier(), 'tester');
+        self::assertSame($token->getRoleNames(), ['ROLE_USER', 'ROLE_EXTRA']);
+        self::assertSame($token->getAttributes(), $attributes);
+    }
+
     public static function provideTokenCases(): iterable
     {
         yield 'Empty attributes' => [
@@ -29,16 +40,5 @@ final class SamlTokenTest extends TestCase
                 'email' => 'tester@example.com',
             ],
         ];
-    }
-
-    #[DataProvider('provideTokenCases')]
-    public function testToken(array $attributes): void
-    {
-        $user = new TestUser('tester');
-        $token = new SamlToken($user, 'fwname', ['ROLE_USER', 'ROLE_EXTRA'], $attributes);
-
-        self::assertSame($token->getUserIdentifier(), 'tester');
-        self::assertSame($token->getRoleNames(), ['ROLE_USER', 'ROLE_EXTRA']);
-        self::assertSame($token->getAttributes(), $attributes);
     }
 }

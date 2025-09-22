@@ -9,19 +9,20 @@ use Symfony\Component\Security\Core\User\UserInterface;
 
 final class TestUser implements UserInterface
 {
+    /** @phpstan-ignore-next-line */
     private string $email;
 
     /**
      * @param array<string> $roles
      */
     public function __construct(
-        private string $identifier,
+        private readonly string $identifier,
         private array $roles = [],
     ) {}
 
     public function getUserIdentifier(): string
     {
-        return $this->identifier;
+        return $this->identifier; // @phpstan-ignore-line
     }
 
     public function getRoles(): array
@@ -30,13 +31,6 @@ final class TestUser implements UserInterface
     }
 
     public function eraseCredentials(): void {}
-
-    public function setEmail(string $email): self
-    {
-        $this->email = $email;
-
-        return $this;
-    }
 
     public function getEmail(): string
     {

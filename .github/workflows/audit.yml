@@ -7,18 +7,18 @@ jobs:
     name: Audit
     strategy:
       matrix:
-        php-version: [ '8.2', '8.3' ]
+        php-version: [ '8.2', '8.3', '8.4' ]
       fail-fast: false
     runs-on: ubuntu-latest
     steps:
       - name: Checkout (Push)
-        uses: actions/checkout@v4
+        uses: actions/checkout@v5
         if: github.event_name == 'push'
         with:
           fetch-depth: 0
 
       - name: Checkout (PR)
-        uses: actions/checkout@v4
+        uses: actions/checkout@v5
         if: github.event_name == 'pull_request'
         with:
           ref: ${{ github.event.pull_request.head.sha }}
@@ -48,7 +48,7 @@ jobs:
         run: composer install --no-interaction
 
       - name: Auditor
-        uses: docker://nbgrp/auditor:0.26.0
+        uses: docker://nbgrp/auditor:0.31.0
 
       - name: Tests
         run: vendor/bin/phpunit

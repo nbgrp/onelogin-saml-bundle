@@ -24,6 +24,7 @@ final readonly class AuthArgumentResolver implements ValueResolverInterface
         private IdpResolverInterface $idpResolver,
     ) {}
 
+    #[\Override]
     public function resolve(Request $request, ArgumentMetadata $argument): iterable
     {
         if ($argument->getType() !== Auth::class) {

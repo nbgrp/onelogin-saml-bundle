@@ -18,6 +18,7 @@ final readonly class SamlUserFactory implements SamlUserFactoryInterface
         private array $mapping,
     ) {}
 
+    #[\Override]
     public function createUser(string $identifier, array $attributes): UserInterface
     {
         $user = new $this->userClass($identifier);

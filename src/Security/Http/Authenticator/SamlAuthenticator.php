@@ -58,12 +58,14 @@ class SamlAuthenticator implements AuthenticatorInterface, AuthenticationEntryPo
         private readonly bool $useProxyVars,
     ) {}
 
+    #[\Override]
     public function supports(Request $request): ?bool
     {
         return $request->isMethod('POST')
             && $this->httpUtils->checkRequestPath($request, (string) $this->options['check_path']);
     }
 
+    #[\Override]
     public function start(Request $request, ?AuthenticationException $authException = null): Response
     {
         $uri = $this->httpUtils->generateUri($request, (string) $this->options['login_path']);
@@ -75,6 +77,7 @@ class SamlAuthenticator implements AuthenticatorInterface, AuthenticationEntryPo
         return new RedirectResponse($uri);
     }
 
+    #[\Override]
     public function authenticate(Request $request): Passport
     {
         if (!$request->hasSession()) {
@@ -96,10 +99,11 @@ class SamlAuthenticator implements AuthenticatorInterface, AuthenticationEntryPo
         return $this->createPassport($oneLoginAuth);
     }
 
+    #[\Override]
     public function createToken(Passport $passport, string $firewallName): TokenInterface
     {
         if (!$passport->hasBadge(SamlAttributesBadge::class)) {
-            throw new LogicException(sprintf('Passport should contains a "%s" badge.', SamlAttributesBadge::class));
+            throw new LogicException(\sprintf('Passport should contains a "%s" badge.', SamlAttributesBadge::class));
         }
 
         $badge = $passport->getBadge(SamlAttributesBadge::class);
@@ -112,11 +116,13 @@ class SamlAuthenticator implements AuthenticatorInterface, AuthenticationEntryPo
         return new SamlToken($passport->getUser(), $firewallName, $passport->getUser()->getRoles(), $attributes);
     }
 
+    #[\Override]
     public function onAuthenticationSuccess(Request $request, TokenInterface $token, string $firewallName): ?Response
     {
         return $this->successHandler->onAuthenticationSuccess($request, $token);
     }
 
+    #[\Override]
     public function onAuthenticationFailure(Request $request, AuthenticationException $exception): ?Response
     {
         return $this->failureHandler->onAuthenticationFailure($request, $exception);

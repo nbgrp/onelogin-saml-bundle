@@ -30,16 +30,19 @@ class SamlFactory extends AbstractFactory
         $this->addOption('success_handler', SamlAuthenticationSuccessHandler::class);
     }
 
+    #[\Override]
     public function getPriority(): int
     {
         return self::PRIORITY;
     }
 
+    #[\Override]
     public function getKey(): string
     {
         return 'saml';
     }
 
+    #[\Override]
     public function createAuthenticator(ContainerBuilder $container, string $firewallName, array $config, string $userProviderId): string
     {
         $authenticatorId = 'security.authenticator.saml.'.$firewallName;

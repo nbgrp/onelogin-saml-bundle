@@ -21,6 +21,21 @@ use Symfony\Component\Security\Http\HttpUtils;
 #[CoversClass(SamlAuthenticationSuccessHandler::class)]
 final class SamlAuthenticationSuccessHandlerTest extends TestCase
 {
+    #[DataProvider('provideHandlerCases')]
+    public function testHandler(array $options, Request $request, string $expectedLocation): void
+    {
+        $token = self::createStub(TokenInterface::class);
+        $urlGenerator = $this->createConfiguredMock(UrlGeneratorInterface::class, [
+            'generate' => 'http://localhost/login',
+        ]);
+        $handler = new SamlAuthenticationSuccessHandler(new HttpUtils($urlGenerator), $options);
+        $response = $handler->onAuthenticationSuccess($request, $token);
+
+        self::assertNotNull($response);
+        self::assertSame(Response::HTTP_FOUND, $response->getStatusCode());
+        self::assertSame($expectedLocation, $response->headers->get('Location'));
+    }
+
     public static function provideHandlerCases(): iterable
     {
         yield 'Always use default target path' => [
@@ -66,21 +81,6 @@ final class SamlAuthenticationSuccessHandlerTest extends TestCase
             'request' => Request::create('/'),
             'expectedLocation' => 'http://localhost/parent-default',
         ];
-    }
-
-    #[DataProvider('provideHandlerCases')]
-    public function testHandler(array $options, Request $request, string $expectedLocation): void
-    {
-        $token = self::createStub(TokenInterface::class);
-        $urlGenerator = $this->createConfiguredMock(UrlGeneratorInterface::class, [
-            'generate' => 'http://localhost/login',
-        ]);
-        $handler = new SamlAuthenticationSuccessHandler(new HttpUtils($urlGenerator), $options);
-        $response = $handler->onAuthenticationSuccess($request, $token);
-
-        self::assertNotNull($response);
-        self::assertSame(Response::HTTP_FOUND, $response->getStatusCode());
-        self::assertSame($expectedLocation, $response->headers->get('Location'));
     }
 
     public function testEmptyRelayState(): void

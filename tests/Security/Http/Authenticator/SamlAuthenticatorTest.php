@@ -48,6 +48,17 @@ use Symfony\Contracts\EventDispatcher\EventDispatcherInterface;
 #[CoversClass(SamlAuthenticator::class)]
 final class SamlAuthenticatorTest extends TestCase
 {
+    #[DataProvider('provideSupportsCases')]
+    public function testSupports(Request $request, bool $expectedSupports): void
+    {
+        $authenticator = $this->createSamlAuthenticator(
+            httpUtils: new HttpUtils(),
+            options: ['check_path' => '/check'],
+        );
+
+        self::assertSame($expectedSupports, $authenticator->supports($request));
+    }
+
     public static function provideSupportsCases(): iterable
     {
         yield 'GET request' => [
@@ -66,6 +77,21 @@ final class SamlAuthenticatorTest extends TestCase
         ];
     }
 
+    #[DataProvider('provideStartCases')]
+    public function testStart(Request $request, string $idpParameterName, string $expectedLocation): void
+    {
+        $authenticator = $this->createSamlAuthenticator(
+            httpUtils: new HttpUtils(),
+            idpResolver: new IdpResolver($idpParameterName),
+            options: ['login_path' => '/login'],
+            idpParameterName: $idpParameterName,
+        );
+        $response = $authenticator->start($request);
+
+        self::assertSame(Response::HTTP_FOUND, $response->getStatusCode());
+        self::assertSame($expectedLocation, $response->headers->get('Location'));
+    }
+
     public static function provideStartCases(): iterable
     {
         yield 'Without idp' => [
@@ -79,6 +105,47 @@ final class SamlAuthenticatorTest extends TestCase
             'idpParameterName' => 'fw',
             'expectedLocation' => 'http://localhost/login?fw=custom',
         ];
+    }
+
+    public function testAuthenticateSessionException(): void
+    {
+        $authenticator = $this->createSamlAuthenticator();
+
+        $this->expectException(SessionUnavailableException::class);
+        $this->expectExceptionMessage('This authentication method requires a session.');
+
+        $authenticator->authenticate(Request::create('/'));
+    }
+
+    /**
+     * @param callable(TestCase): IdpResolverInterface  $idpResolver
+     * @param callable(TestCase): AuthRegistryInterface $authRegistry
+     */
+    #[DataProvider('provideAuthenticateOneLoginErrorsExceptionCases')]
+    public function testAuthenticateOneLoginErrorsException(
+        callable $idpResolver,
+        callable $authRegistry,
+        string $expectedMessage,
+    ): void {
+        $request = Request::create('/');
+        $request->setSession(new Session(new MockArraySessionStorage()));
+
+        $logger = $this->createMock(LoggerInterface::class);
+        $logger
+            ->method('error')
+            ->with($expectedMessage)
+        ;
+
+        $authenticator = $this->createSamlAuthenticator(
+            idpResolver: $idpResolver($this),
+            authRegistry: $authRegistry($this),
+            logger: $logger,
+        );
+
+        $this->expectException(AuthenticationException::class);
+        $this->expectExceptionMessage($expectedMessage);
+
+        $authenticator->authenticate($request);
     }
 
     public static function provideAuthenticateOneLoginErrorsExceptionCases(): iterable
@@ -146,143 +213,89 @@ final class SamlAuthenticatorTest extends TestCase
         ];
     }
 
-    public static function provideAuthenticateExceptionCases(): iterable
+    public function testAuthenticateWithoutAuthServiceException(): void
     {
-        yield 'SAML attributes without identifier attribute' => [
-            'auth' => static function (TestCase $case): Auth {
-                $settingsMock = $case->createMock(Settings::class);
-                $settingsMock
-                    ->method('getSecurityData')
-                    ->willReturn([])
-                ;
-                $auth = $case->createConfiguredMock(Auth::class, [
-                    'getAttributes' => [],
-                    'getSessionIndex' => 'session_index',
-                    'getSettings' => $settingsMock,
-                ]);
-                $auth
-                    ->expects($case->never())
-                    ->method('getNameId')
-                ;
+        $request = Request::create('/');
+        $request->setSession(new Session(new MockArraySessionStorage()));
 
-                return $auth;
-            },
-            'userProvider' => null,
-            'samlUserFactory' => null,
-            'options' => [
-                'identifier_attribute' => 'username',
-            ],
-            'expectedException' => \RuntimeException::class,
-            'expectedMessage' => 'Attribute "username" not found in SAML data.',
-        ];
+        $idpResolver = $this->createConfiguredMock(IdpResolverInterface::class, [
+            'resolve' => null,
+        ]);
+        $authenticator = $this->createSamlAuthenticator(
+            idpResolver: $idpResolver,
+            authRegistry: new AuthRegistry(),
+        );
 
-        yield 'SAML attributes with invalid identifier attribute' => [
-            'auth' => static function (TestCase $case): Auth {
-                $settingsMock = $case->createMock(Settings::class);
-                $settingsMock
-                    ->method('getSecurityData')
-                    ->willReturn([])
-                ;
-                $auth = $case->createConfiguredMock(Auth::class, [
-                    'getAttributes' => [
-                        'username' => [],
-                    ],
-                    'getSessionIndex' => 'session_index',
-                    'getSettings' => $settingsMock,
-                ]);
-                $auth
-                    ->expects($case->never())
-                    ->method('getNameId')
-                ;
+        $this->expectException(AuthenticationServiceException::class);
+        $this->expectExceptionMessage('There is no configured Auth services.');
 
-                return $auth;
-            },
-            'userProvider' => null,
-            'samlUserFactory' => null,
-            'options' => [
-                'identifier_attribute' => 'username',
-            ],
-            'expectedException' => \RuntimeException::class,
-            'expectedMessage' => 'Attribute "username" does not contain valid user identifier.',
-        ];
+        $authenticator->authenticate($request);
+    }
 
-        yield 'User not found without SAML user factory' => [
-            'auth' => static function (TestCase $case): Auth {
-                $settingsMock = $case->createMock(Settings::class);
-                $settingsMock
-                    ->method('getSecurityData')
-                    ->willReturn([])
-                ;
-                $auth = $case->createConfiguredMock(Auth::class, [
-                    'getAttributes' => [],
-                    'getSessionIndex' => 'session_index',
-                    'getSettings' => $settingsMock,
-                    'getNameId' => 'tester_id',
-                ]);
-                $auth
-                    ->expects($case->never())
-                    ->method('getAttributesWithFriendlyName')
-                ;
+    /**
+     * @param callable(TestCase): Auth                      $auth
+     * @param ?callable(TestCase): UserProviderInterface    $userProvider
+     * @param ?callable(TestCase): SamlUserFactoryInterface $samlUserFactory
+     * @param ?callable(TestCase): EventDispatcherInterface $eventDispatcher
+     */
+    #[DataProvider('provideSuccessAuthenticateCases')]
+    public function testSuccessAuthenticate(
+        callable $auth,
+        ?callable $userProvider,
+        ?callable $samlUserFactory,
+        ?callable $eventDispatcher,
+        array $options,
+        ?string $lastRequestId,
+        bool $useProxyVars,
+        string $expectedUserIdentifier,
+        array $expectedSamlAttributes,
+        bool $expectedUseProxyVars,
+    ): void {
+        $request = Request::create('/');
+        $session = new Session(new MockArraySessionStorage());
+        if ($lastRequestId) {
+            $session->set(SamlAuthenticator::LAST_REQUEST_ID, $lastRequestId);
+        }
+        $request->setSession($session);
 
-                return $auth;
-            },
-            'userProvider' => static function (TestCase $case): UserProviderInterface {
-                $userProvider = $case->createMock(UserProviderInterface::class);
-                $userProvider
-                    ->method('loadUserByIdentifier')
-                    ->willThrowException(new UserNotFoundException())
-                ;
+        $idpResolver = $this->createConfiguredMock(IdpResolverInterface::class, [
+            'resolve' => null,
+        ]);
 
-                return $userProvider;
-            },
-            'samlUserFactory' => null,
-            'options' => [],
-            'expectedException' => UserNotFoundException::class,
-            'expectedMessage' => null,
-        ];
+        $authRegistry = new AuthRegistry();
+        $authRegistry->addService('foo', $auth($this));
 
-        yield 'User not found + SAML user factory exception' => [
-            'auth' => static function (TestCase $case): Auth {
-                $settingsMock = $case->createMock(Settings::class);
-                $settingsMock
-                    ->method('getSecurityData')
-                    ->willReturn([])
-                ;
-                $auth = $case->createConfiguredMock(Auth::class, [
-                    'getAttributes' => [],
-                    'getSessionIndex' => 'session_index',
-                    'getSettings' => $settingsMock,
-                    'getNameId' => 'tester_id',
-                ]);
-                $auth
-                    ->expects($case->never())
-                    ->method('getAttributesWithFriendlyName')
-                ;
+        $authenticator = $this->createSamlAuthenticator(
+            userProvider: $userProvider !== null ? $userProvider($this) : null,
+            idpResolver: $idpResolver,
+            authRegistry: $authRegistry,
+            options: $options,
+            samlUserFactory: $samlUserFactory !== null ? $samlUserFactory($this) : null,
+            useProxyVars: $useProxyVars,
+        );
 
-                return $auth;
-            },
-            'userProvider' => static function (TestCase $case): UserProviderInterface {
-                $userProvider = $case->createMock(UserProviderInterface::class);
-                $userProvider
-                    ->method('loadUserByIdentifier')
-                    ->willThrowException(new UserNotFoundException())
-                ;
+        self::assertFalse(Utils::getProxyVars());
+        $passport = $authenticator->authenticate($request);
+        self::assertSame($expectedUseProxyVars, Utils::getProxyVars());
+        self::assertSame($expectedUserIdentifier, $passport->getUser()->getUserIdentifier());
 
-                return $userProvider;
-            },
-            'samlUserFactory' => static function (TestCase $case): SamlUserFactoryInterface {
-                $samlUserFactory = $case->createMock(SamlUserFactoryInterface::class);
-                $samlUserFactory
-                    ->method('createUser')
-                    ->willThrowException(new \Exception())
-                ;
+        /** @var SamlAttributesBadge $badge */
+        $badge = $passport->getBadge(SamlAttributesBadge::class);
+        self::assertSame($expectedSamlAttributes, $badge->getAttributes());
 
-                return $samlUserFactory;
-            },
-            'options' => [],
-            'expectedException' => AuthenticationException::class,
-            'expectedMessage' => 'The authentication failed.',
-        ];
+        if ($eventDispatcher === null) {
+            return;
+        }
+
+        /** @var DeferredEventBadge $deferredEventBadge */
+        $deferredEventBadge = $passport->getBadge(DeferredEventBadge::class);
+        self::assertInstanceOf(DeferredEventBadge::class, $deferredEventBadge);
+
+        /** @var Event $deferredEvent */
+        $deferredEvent = $deferredEventBadge->getEvent();
+        self::assertInstanceOf(Event::class, $deferredEvent);
+
+        $eventDispatcher($this)->dispatch($deferredEvent);
     }
 
     public static function provideSuccessAuthenticateCases(): iterable
@@ -505,158 +518,6 @@ final class SamlAuthenticatorTest extends TestCase
         ];
     }
 
-    #[DataProvider('provideSupportsCases')]
-    public function testSupports(Request $request, bool $expectedSupports): void
-    {
-        $authenticator = $this->createSamlAuthenticator(
-            httpUtils: new HttpUtils(),
-            options: ['check_path' => '/check'],
-        );
-
-        self::assertSame($expectedSupports, $authenticator->supports($request));
-    }
-
-    #[DataProvider('provideStartCases')]
-    public function testStart(Request $request, string $idpParameterName, string $expectedLocation): void
-    {
-        $authenticator = $this->createSamlAuthenticator(
-            httpUtils: new HttpUtils(),
-            idpResolver: new IdpResolver($idpParameterName),
-            options: ['login_path' => '/login'],
-            idpParameterName: $idpParameterName,
-        );
-        $response = $authenticator->start($request);
-
-        self::assertSame(Response::HTTP_FOUND, $response->getStatusCode());
-        self::assertSame($expectedLocation, $response->headers->get('Location'));
-    }
-
-    public function testAuthenticateSessionException(): void
-    {
-        $authenticator = $this->createSamlAuthenticator();
-
-        $this->expectException(SessionUnavailableException::class);
-        $this->expectExceptionMessage('This authentication method requires a session.');
-
-        $authenticator->authenticate(Request::create('/'));
-    }
-
-    /**
-     * @param callable(TestCase): IdpResolverInterface  $idpResolver
-     * @param callable(TestCase): AuthRegistryInterface $authRegistry
-     */
-    #[DataProvider('provideAuthenticateOneLoginErrorsExceptionCases')]
-    public function testAuthenticateOneLoginErrorsException(
-        callable $idpResolver,
-        callable $authRegistry,
-        string $expectedMessage,
-    ): void {
-        $request = Request::create('/');
-        $request->setSession(new Session(new MockArraySessionStorage()));
-
-        $logger = $this->createMock(LoggerInterface::class);
-        $logger
-            ->method('error')
-            ->with($expectedMessage)
-        ;
-
-        $authenticator = $this->createSamlAuthenticator(
-            idpResolver: $idpResolver($this),
-            authRegistry: $authRegistry($this),
-            logger: $logger,
-        );
-
-        $this->expectException(AuthenticationException::class);
-        $this->expectExceptionMessage($expectedMessage);
-
-        $authenticator->authenticate($request);
-    }
-
-    public function testAuthenticateWithoutAuthServiceException(): void
-    {
-        $request = Request::create('/');
-        $request->setSession(new Session(new MockArraySessionStorage()));
-
-        $idpResolver = $this->createConfiguredMock(IdpResolverInterface::class, [
-            'resolve' => null,
-        ]);
-        $authenticator = $this->createSamlAuthenticator(
-            idpResolver: $idpResolver,
-            authRegistry: new AuthRegistry(),
-        );
-
-        $this->expectException(AuthenticationServiceException::class);
-        $this->expectExceptionMessage('There is no configured Auth services.');
-
-        $authenticator->authenticate($request);
-    }
-
-    /**
-     * @param callable(TestCase): Auth                      $auth
-     * @param ?callable(TestCase): UserProviderInterface    $userProvider
-     * @param ?callable(TestCase): SamlUserFactoryInterface $samlUserFactory
-     * @param ?callable(TestCase): EventDispatcherInterface $eventDispatcher
-     */
-    #[DataProvider('provideSuccessAuthenticateCases')]
-    public function testSuccessAuthenticate(
-        callable $auth,
-        ?callable $userProvider,
-        ?callable $samlUserFactory,
-        ?callable $eventDispatcher,
-        array $options,
-        ?string $lastRequestId,
-        bool $useProxyVars,
-        string $expectedUserIdentifier,
-        array $expectedSamlAttributes,
-        bool $expectedUseProxyVars,
-    ): void {
-        $request = Request::create('/');
-        $session = new Session(new MockArraySessionStorage());
-        if ($lastRequestId) {
-            $session->set(SamlAuthenticator::LAST_REQUEST_ID, $lastRequestId);
-        }
-        $request->setSession($session);
-
-        $idpResolver = $this->createConfiguredMock(IdpResolverInterface::class, [
-            'resolve' => null,
-        ]);
-
-        $authRegistry = new AuthRegistry();
-        $authRegistry->addService('foo', $auth($this));
-
-        $authenticator = $this->createSamlAuthenticator(
-            userProvider: $userProvider !== null ? $userProvider($this) : null,
-            idpResolver: $idpResolver,
-            authRegistry: $authRegistry,
-            options: $options,
-            samlUserFactory: $samlUserFactory !== null ? $samlUserFactory($this) : null,
-            useProxyVars: $useProxyVars,
-        );
-
-        self::assertFalse(Utils::getProxyVars());
-        $passport = $authenticator->authenticate($request);
-        self::assertSame($expectedUseProxyVars, Utils::getProxyVars());
-        self::assertSame($expectedUserIdentifier, $passport->getUser()->getUserIdentifier());
-
-        /** @var SamlAttributesBadge $badge */
-        $badge = $passport->getBadge(SamlAttributesBadge::class);
-        self::assertSame($expectedSamlAttributes, $badge->getAttributes());
-
-        if ($eventDispatcher === null) {
-            return;
-        }
-
-        /** @var DeferredEventBadge $deferredEventBadge */
-        $deferredEventBadge = $passport->getBadge(DeferredEventBadge::class);
-        self::assertInstanceOf(DeferredEventBadge::class, $deferredEventBadge);
-
-        /** @var Event $deferredEvent */
-        $deferredEvent = $deferredEventBadge->getEvent();
-        self::assertInstanceOf(Event::class, $deferredEvent);
-
-        $eventDispatcher($this)->dispatch($deferredEvent);
-    }
-
     /**
      * @param callable(TestCase): Auth                      $auth
      * @param ?callable(TestCase): UserProviderInterface    $userProvider
@@ -696,6 +557,145 @@ final class SamlAuthenticatorTest extends TestCase
         }
 
         $authenticator->authenticate($request)->getUser();
+    }
+
+    public static function provideAuthenticateExceptionCases(): iterable
+    {
+        yield 'SAML attributes without identifier attribute' => [
+            'auth' => static function (TestCase $case): Auth {
+                $settingsMock = $case->createMock(Settings::class);
+                $settingsMock
+                    ->method('getSecurityData')
+                    ->willReturn([])
+                ;
+                $auth = $case->createConfiguredMock(Auth::class, [
+                    'getAttributes' => [],
+                    'getSessionIndex' => 'session_index',
+                    'getSettings' => $settingsMock,
+                ]);
+                $auth
+                    ->expects($case->never())
+                    ->method('getNameId')
+                ;
+
+                return $auth;
+            },
+            'userProvider' => null,
+            'samlUserFactory' => null,
+            'options' => [
+                'identifier_attribute' => 'username',
+            ],
+            'expectedException' => \RuntimeException::class,
+            'expectedMessage' => 'Attribute "username" not found in SAML data.',
+        ];
+
+        yield 'SAML attributes with invalid identifier attribute' => [
+            'auth' => static function (TestCase $case): Auth {
+                $settingsMock = $case->createMock(Settings::class);
+                $settingsMock
+                    ->method('getSecurityData')
+                    ->willReturn([])
+                ;
+                $auth = $case->createConfiguredMock(Auth::class, [
+                    'getAttributes' => [
+                        'username' => [],
+                    ],
+                    'getSessionIndex' => 'session_index',
+                    'getSettings' => $settingsMock,
+                ]);
+                $auth
+                    ->expects($case->never())
+                    ->method('getNameId')
+                ;
+
+                return $auth;
+            },
+            'userProvider' => null,
+            'samlUserFactory' => null,
+            'options' => [
+                'identifier_attribute' => 'username',
+            ],
+            'expectedException' => \RuntimeException::class,
+            'expectedMessage' => 'Attribute "username" does not contain valid user identifier.',
+        ];
+
+        yield 'User not found without SAML user factory' => [
+            'auth' => static function (TestCase $case): Auth {
+                $settingsMock = $case->createMock(Settings::class);
+                $settingsMock
+                    ->method('getSecurityData')
+                    ->willReturn([])
+                ;
+                $auth = $case->createConfiguredMock(Auth::class, [
+                    'getAttributes' => [],
+                    'getSessionIndex' => 'session_index',
+                    'getSettings' => $settingsMock,
+                    'getNameId' => 'tester_id',
+                ]);
+                $auth
+                    ->expects($case->never())
+                    ->method('getAttributesWithFriendlyName')
+                ;
+
+                return $auth;
+            },
+            'userProvider' => static function (TestCase $case): UserProviderInterface {
+                $userProvider = $case->createMock(UserProviderInterface::class);
+                $userProvider
+                    ->method('loadUserByIdentifier')
+                    ->willThrowException(new UserNotFoundException())
+                ;
+
+                return $userProvider;
+            },
+            'samlUserFactory' => null,
+            'options' => [],
+            'expectedException' => UserNotFoundException::class,
+            'expectedMessage' => null,
+        ];
+
+        yield 'User not found + SAML user factory exception' => [
+            'auth' => static function (TestCase $case): Auth {
+                $settingsMock = $case->createMock(Settings::class);
+                $settingsMock
+                    ->method('getSecurityData')
+                    ->willReturn([])
+                ;
+                $auth = $case->createConfiguredMock(Auth::class, [
+                    'getAttributes' => [],
+                    'getSessionIndex' => 'session_index',
+                    'getSettings' => $settingsMock,
+                    'getNameId' => 'tester_id',
+                ]);
+                $auth
+                    ->expects($case->never())
+                    ->method('getAttributesWithFriendlyName')
+                ;
+
+                return $auth;
+            },
+            'userProvider' => static function (TestCase $case): UserProviderInterface {
+                $userProvider = $case->createMock(UserProviderInterface::class);
+                $userProvider
+                    ->method('loadUserByIdentifier')
+                    ->willThrowException(new UserNotFoundException())
+                ;
+
+                return $userProvider;
+            },
+            'samlUserFactory' => static function (TestCase $case): SamlUserFactoryInterface {
+                $samlUserFactory = $case->createMock(SamlUserFactoryInterface::class);
+                $samlUserFactory
+                    ->method('createUser')
+                    ->willThrowException(new \Exception())
+                ;
+
+                return $samlUserFactory;
+            },
+            'options' => [],
+            'expectedException' => AuthenticationException::class,
+            'expectedMessage' => 'The authentication failed.',
+        ];
     }
 
     public function testCreateToken(): void

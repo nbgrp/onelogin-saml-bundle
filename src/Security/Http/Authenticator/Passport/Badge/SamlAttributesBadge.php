@@ -21,6 +21,7 @@ readonly class SamlAttributesBadge implements BadgeInterface
         return $this->attributes;
     }
 
+    #[\Override]
     public function isResolved(): bool
     {
         return true;

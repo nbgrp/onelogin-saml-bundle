@@ -19,6 +19,12 @@ final class IdpResolverTest extends TestCase
 {
     private IdpResolver $resolver;
 
+    #[DataProvider('provideResolveCases')]
+    public function testResolve(Request $request, ?string $expected): void
+    {
+        self::assertSame($expected, $this->resolver->resolve($request));
+    }
+
     public static function provideResolveCases(): iterable
     {
         yield 'Request with ipd in query' => [
@@ -35,12 +41,6 @@ final class IdpResolverTest extends TestCase
             'request' => new Request(),
             'expected' => null,
         ];
-    }
-
-    #[DataProvider('provideResolveCases')]
-    public function testResolve(Request $request, ?string $expected): void
-    {
-        self::assertSame($expected, $this->resolver->resolve($request));
     }
 
     protected function setUp(): void
