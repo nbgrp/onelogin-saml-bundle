@@ -28,6 +28,7 @@ class NbgrpOneloginSamlExtension extends Extension
         $container->setParameter('nbgrp_onelogin_saml.onelogin_settings', $config['onelogin_settings']);
         $container->setParameter('nbgrp_onelogin_saml.use_proxy_vars', $config['use_proxy_vars']);
         $container->setParameter('nbgrp_onelogin_saml.idp_parameter_name', $config['idp_parameter_name']);
+        $container->setParameter('nbgrp_onelogin_saml.authn_request', $config['authn_request']);
 
         if (\array_key_exists('entity_manager_name', $config)) {
             $container->setParameter('nbgrp_onelogin_saml.entity_manager', $config['entity_manager_name']);
