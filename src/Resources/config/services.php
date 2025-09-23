@@ -27,6 +27,7 @@ return static function (ContainerConfigurator $container): void {
         ->set(Controller\Login::class)
             ->args([
                 service('security.firewall.map'),
+                param('nbgrp_onelogin_saml.authn_request'),
             ])
 
         ->set(EventListener\Security\SamlLogoutListener::class)
