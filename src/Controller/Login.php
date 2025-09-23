@@ -20,6 +20,7 @@ class Login
 {
     public function __construct(
         private readonly FirewallMap $firewallMap,
+        private readonly array $authnRequestParams,
     ) {}
 
     public function __invoke(Request $request, Auth $auth): RedirectResponse
@@ -59,9 +60,18 @@ class Login
         return $session->get('_security.'.$firewallName.'.target_path');
     }
 
+    /** @psalm-suppress MixedArgument */
     private function processLoginAndGetRedirectUrl(Auth $auth, ?string $targetPath, ?SessionInterface $session): string
     {
-        $redirectUrl = $auth->login(returnTo: $targetPath, stay: true);
+        $redirectUrl = $auth->login(
+            returnTo: $targetPath,
+            parameters: $this->authnRequestParams['parameters'] ?? [],
+            forceAuthn: $this->authnRequestParams['forceAuthn'] ?? false,
+            isPassive: $this->authnRequestParams['isPassive'] ?? false,
+            stay: true,
+            setNameIdPolicy: $this->authnRequestParams['setNameIdPolicy'] ?? true,
+            nameIdValueReq: ($this->authnRequestParams['nameIdValueReq'] ?? null),
+        );
 
         $security = $auth->getSettings()->getSecurityData();
         if (($security['rejectUnsolicitedResponsesWithInResponseTo'] ?? false) !== false && $session instanceof SessionInterface) {
