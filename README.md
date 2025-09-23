@@ -196,6 +196,7 @@ Edit your `config/routes.yaml`:
 ``` yml
 nbgrp_saml:
     resource: "@NbgrpOneloginSamlBundle/Resources/config/routes.php"
+    type: php
 ```
 
 ### Multiple IdP
