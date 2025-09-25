@@ -1,7 +1,7 @@
 <?xml version="1.0"?>
 <psalm
     errorLevel="1"
-    phpVersion="8.2"
+    phpVersion="8.4"
     strictBinaryOperands="true"
     findUnusedPsalmSuppress="true"
     sealAllMethods="true"
@@ -17,14 +17,6 @@
             <file name="vendor/symfony/security-http/Authentication/DefaultAuthenticationSuccessHandler.php" />
         </ignoreFiles>
     </projectFiles>
-
-    <issueHandlers>
-        <ClassMustBeFinal>
-            <errorLevel type="suppress">
-                <directory name="src" />
-            </errorLevel>
-        </ClassMustBeFinal>
-    </issueHandlers>
 
     <plugins>
         <pluginClass class="Psalm\SymfonyPsalmPlugin\Plugin" />

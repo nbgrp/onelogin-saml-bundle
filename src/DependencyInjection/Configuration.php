@@ -22,7 +22,6 @@ class Configuration implements ConfigurationInterface
         $rootNode = $treeBuilder->getRootNode();
 
         // @formatter:off
-        // @phpstan-ignore-next-line
         $rootNode
             ->info('nb:group OneLogin PHP Symfony Bundle configuration')
             ->children()

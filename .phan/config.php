@@ -8,7 +8,7 @@ use Phan\Issue;
 define('APP_DIR', dirname(__DIR__));
 
 return [
-    'target_php_version' => '8.2',
+    'target_php_version' => '8.4',
 
     'allow_missing_properties' => false,
 

@@ -49,7 +49,7 @@ class SamlUserProviderFactory implements UserProviderFactoryInterface
                     ->end()
                 ->end()
                 ->arrayNode('default_roles')
-                    ->prototype('scalar')->end()
+                    ->scalarPrototype()->end()
                     ->defaultValue(['ROLE_USER'])
                 ->end()
             ->end()
