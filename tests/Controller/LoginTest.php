@@ -37,7 +37,7 @@ final class LoginTest extends TestCase
         $auth = $this->createMock(Auth::class);
         $auth
             ->method('login')
-            ->with('/target-path-after-login', [], true, false, true, true, null)
+            ->with('/target-path-after-login')
             ->willReturn('/redirect_url')
         ;
 
@@ -60,7 +60,7 @@ final class LoginTest extends TestCase
         $session->set('_security.foo.target_path', '/target-path-after-login');
         $request->setSession($session);
 
-        $response = (new Login($firewallMap, ['forceAuthn' => true]))($request, $auth);
+        $response = (new Login($firewallMap))($request, $auth);
 
         self::assertSame('/redirect_url', $response->headers->get('Location'));
         self::assertSame('requestID', $session->get(SamlAuthenticator::LAST_REQUEST_ID));
@@ -100,7 +100,7 @@ final class LoginTest extends TestCase
         $session->set('_security.foo.target_path', '/target-path-after-login');
         $request->setSession($session);
 
-        $response = (new Login($firewallMap, []))($request, $auth);
+        $response = (new Login($firewallMap))($request, $auth);
 
         self::assertSame('/redirect_url', $response->headers->get('Location'));
         self::assertFalse($session->has(SamlAuthenticator::LAST_REQUEST_ID));
@@ -117,7 +117,7 @@ final class LoginTest extends TestCase
 
         $auth = self::createStub(Auth::class);
 
-        $controller = new Login($firewallMap, []);
+        $controller = new Login($firewallMap);
 
         $this->expectException(\RuntimeException::class);
         $this->expectExceptionMessage($expectedMessage);
@@ -159,7 +159,7 @@ final class LoginTest extends TestCase
 
         $auth = self::createStub(Auth::class);
 
-        $controller = new Login($firewallMap, []);
+        $controller = new Login($firewallMap);
         $request = Request::create('/login');
         $request->setSession(new Session(new MockArraySessionStorage()));
 

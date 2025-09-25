@@ -64,13 +64,6 @@ final class ConfigurationTest extends TestCase
                 ],
                 'use_proxy_vars' => false,
                 'idp_parameter_name' => 'idp',
-                'authn_request' => [
-                    'parameters' => [],
-                    'forceAuthn' => false,
-                    'isPassive' => false,
-                    'setNameIdPolicy' => true,
-                    'nameIdValueReq' => null,
-                ],
             ],
         ];
 
@@ -305,71 +298,6 @@ final class ConfigurationTest extends TestCase
                 'use_proxy_vars' => true,
                 'idp_parameter_name' => 'custom-idp',
                 'entity_manager_name' => 'custom-em',
-                'authn_request' => [
-                    'parameters' => [],
-                    'forceAuthn' => false,
-                    'isPassive' => false,
-                    'setNameIdPolicy' => true,
-                    'nameIdValueReq' => null,
-                ],
-            ],
-        ];
-
-        yield 'AuthN request configuration' => [
-            'config' => [
-                'onelogin_settings' => [
-                    'test' => [
-                        'idp' => [
-                            'entityId' => 'test-idp',
-                            'singleSignOnService' => [
-                                'url' => 'http://example.com/sso',
-                            ],
-                        ],
-                    ],
-                ],
-                'authn_request' => [
-                    'parameters' => [
-                        'Param1' => 'value1',
-                        'Param2' => 'value2',
-                    ],
-                    'forceAuthn' => true,
-                    'setNameIdPolicy' => false,
-                    'nameIdValueReq' => 123,
-                ],
-            ],
-            'expected' => [
-                'onelogin_settings' => [
-                    'test' => [
-                        'idp' => [
-                            'entityId' => 'test-idp',
-                            'singleSignOnService' => [
-                                'url' => 'http://example.com/sso',
-                            ],
-                        ],
-                        'baseurl' => '<request_scheme_and_host>/saml/',
-                        'sp' => [
-                            'entityId' => '<request_scheme_and_host>/saml/metadata',
-                            'assertionConsumerService' => [
-                                'url' => '<request_scheme_and_host>/saml/acs',
-                            ],
-                            'singleLogoutService' => [
-                                'url' => '<request_scheme_and_host>/saml/logout',
-                            ],
-                        ],
-                    ],
-                ],
-                'authn_request' => [
-                    'parameters' => [
-                        'Param1' => 'value1',
-                        'Param2' => 'value2',
-                    ],
-                    'forceAuthn' => true,
-                    'setNameIdPolicy' => false,
-                    'nameIdValueReq' => '123',
-                    'isPassive' => false,
-                ],
-                'use_proxy_vars' => false,
-                'idp_parameter_name' => 'idp',
             ],
         ];
     }
