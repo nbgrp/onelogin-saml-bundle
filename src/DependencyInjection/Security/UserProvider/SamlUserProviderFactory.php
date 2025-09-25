@@ -12,7 +12,7 @@ use Symfony\Component\DependencyInjection\ChildDefinition;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\Security\Core\User\UserInterface;
 
-class SamlUserProviderFactory implements UserProviderFactoryInterface
+final class SamlUserProviderFactory implements UserProviderFactoryInterface
 {
     #[\Override]
     public function create(ContainerBuilder $container, string $id, array $config): void

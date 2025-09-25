@@ -33,7 +33,7 @@ final class EntityManagerCompilerPassTest extends TestCase
             ->method('getParameter')
         ;
 
-        (new EntityManagerCompilerPass())->process($container);
+        new EntityManagerCompilerPass()->process($container);
     }
 
     public function testNoEntityManagerProcess(): void
@@ -59,7 +59,7 @@ final class EntityManagerCompilerPassTest extends TestCase
             ->method('findTaggedServiceIds')
         ;
 
-        (new EntityManagerCompilerPass())->process($container);
+        new EntityManagerCompilerPass()->process($container);
     }
 
     public function testSuccessProcess(): void
@@ -86,7 +86,7 @@ final class EntityManagerCompilerPassTest extends TestCase
         $listener2->addTag('nbgrp.saml_user_listener');
         $container->setDefinition('nbgrp.saml_user_listener_2', $listener2);
 
-        (new EntityManagerCompilerPass())->process($container);
+        new EntityManagerCompilerPass()->process($container);
 
         /** @var \Symfony\Component\DependencyInjection\Reference $reference */
         $reference = $listener1->getArgument(0);

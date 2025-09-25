@@ -3,6 +3,8 @@
 
     <config name="installed_paths" value="../../slevomat/coding-standard"/>
 
+    <exclude-pattern>*/src/Security/Http/Authenticator/Passport/Badge/DeferredEventBadge\.php$</exclude-pattern>
+
     <rule ref="Generic.Strings.UnnecessaryStringConcat">
         <properties>
             <property name="allowMultiline" value="true" />

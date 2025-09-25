@@ -27,7 +27,7 @@ final class AuthRegistryCompilerPassTest extends TestCase
             'second' => [],
         ]);
 
-        (new AuthRegistryCompilerPass())->process($container);
+        new AuthRegistryCompilerPass()->process($container);
 
         $authRegistryDefinition = $container->getDefinition(AuthRegistryInterface::class);
         self::assertCount(2, $authRegistryDefinition->getMethodCalls());

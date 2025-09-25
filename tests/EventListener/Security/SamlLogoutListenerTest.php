@@ -44,7 +44,7 @@ final class SamlLogoutListenerTest extends TestCase
             ->willReturn($token)
         ;
 
-        (new SamlLogoutListener($authRegistry($this), $ipdResolver))->processSingleLogout($event);
+        new SamlLogoutListener($authRegistry($this), $ipdResolver)->processSingleLogout($event);
     }
 
     public static function provideCases(): iterable

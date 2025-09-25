@@ -35,7 +35,7 @@ final class DeferredUserListenerTest extends TestCase
             ->method('dispatch')
         ;
 
-        (new DeferredUserListener())->dispatchDeferredEvent($event, '', $eventDispatcher);
+        new DeferredUserListener()->dispatchDeferredEvent($event, '', $eventDispatcher);
     }
 
     public function testBadgeWithoutEvent(): void
@@ -51,7 +51,7 @@ final class DeferredUserListenerTest extends TestCase
             ->method('dispatch')
         ;
 
-        (new DeferredUserListener())->dispatchDeferredEvent($event, '', $eventDispatcher);
+        new DeferredUserListener()->dispatchDeferredEvent($event, '', $eventDispatcher);
     }
 
     public function testSuccessfulEventDispatching(): void
@@ -59,7 +59,7 @@ final class DeferredUserListenerTest extends TestCase
         $deferredEvent = $this->createMock(AbstractUserEvent::class);
 
         $deferredEventBadge = new DeferredEventBadge();
-        $deferredEventBadge->setEvent($deferredEvent);
+        $deferredEventBadge->event = $deferredEvent;
 
         $event = new CheckPassportEvent(
             self::createStub(AuthenticatorInterface::class),
@@ -73,6 +73,6 @@ final class DeferredUserListenerTest extends TestCase
             ->with($deferredEvent)
         ;
 
-        (new DeferredUserListener())->dispatchDeferredEvent($event, '', $eventDispatcher);
+        new DeferredUserListener()->dispatchDeferredEvent($event, '', $eventDispatcher);
     }
 }

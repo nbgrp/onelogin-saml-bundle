@@ -20,7 +20,7 @@ final class DeferredUserListener
             return;
         }
 
-        $deferredEvent = $badge->getEvent();
+        $deferredEvent = $badge->event;
         if ($deferredEvent) {
             $eventDispatcher->dispatch($deferredEvent);
         }

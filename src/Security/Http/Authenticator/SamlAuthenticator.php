@@ -39,27 +39,27 @@ use Symfony\Component\Security\Http\EntryPoint\AuthenticationEntryPointInterface
 use Symfony\Component\Security\Http\HttpUtils;
 
 #[AutoconfigureTag('monolog.logger', ['channel' => 'security'])]
-class SamlAuthenticator implements AuthenticatorInterface, AuthenticationEntryPointInterface
+final readonly class SamlAuthenticator implements AuthenticatorInterface, AuthenticationEntryPointInterface
 {
-    public const SESSION_INDEX_ATTRIBUTE = '_saml_session_index';
-    public const LAST_REQUEST_ID = '_saml_last_request_id';
+    public const string SESSION_INDEX_ATTRIBUTE = '_saml_session_index';
+    public const string LAST_REQUEST_ID = '_saml_last_request_id';
 
     public function __construct(
-        private readonly HttpUtils $httpUtils,
-        private readonly UserProviderInterface $userProvider,
-        private readonly IdpResolverInterface $idpResolver,
-        private readonly AuthRegistryInterface $authRegistry,
-        private readonly AuthenticationSuccessHandlerInterface $successHandler,
-        private readonly AuthenticationFailureHandlerInterface $failureHandler,
-        private readonly array $options,
-        private readonly ?SamlUserFactoryInterface $userFactory,
-        private readonly ?LoggerInterface $logger,
-        private readonly string $idpParameterName,
-        private readonly bool $useProxyVars,
+        private HttpUtils $httpUtils,
+        private UserProviderInterface $userProvider,
+        private IdpResolverInterface $idpResolver,
+        private AuthRegistryInterface $authRegistry,
+        private AuthenticationSuccessHandlerInterface $successHandler,
+        private AuthenticationFailureHandlerInterface $failureHandler,
+        private array $options,
+        private ?SamlUserFactoryInterface $userFactory,
+        private ?LoggerInterface $logger,
+        private string $idpParameterName,
+        private bool $useProxyVars,
     ) {}
 
     #[\Override]
-    public function supports(Request $request): ?bool
+    public function supports(Request $request): bool
     {
         return $request->isMethod('POST')
             && $this->httpUtils->checkRequestPath($request, (string) $this->options['check_path']);
@@ -123,12 +123,12 @@ class SamlAuthenticator implements AuthenticatorInterface, AuthenticationEntryPo
     }
 
     #[\Override]
-    public function onAuthenticationFailure(Request $request, AuthenticationException $exception): ?Response
+    public function onAuthenticationFailure(Request $request, AuthenticationException $exception): Response
     {
         return $this->failureHandler->onAuthenticationFailure($request, $exception);
     }
 
-    protected function processResponse(Auth $oneLoginAuth, SessionInterface $session): void
+    private function processResponse(Auth $oneLoginAuth, SessionInterface $session): void
     {
         $requestId = null;
         $security = $oneLoginAuth->getSettings()->getSecurityData();
@@ -140,7 +140,7 @@ class SamlAuthenticator implements AuthenticatorInterface, AuthenticationEntryPo
         $oneLoginAuth->processResponse($requestId);
     }
 
-    protected function createPassport(Auth $oneLoginAuth): Passport
+    private function createPassport(Auth $oneLoginAuth): Passport
     {
         $attributes = $this->extractAttributes($oneLoginAuth);
         $this->logger?->debug('SAML attributes extracted', $attributes);
@@ -155,7 +155,7 @@ class SamlAuthenticator implements AuthenticatorInterface, AuthenticationEntryPo
                         $user = $this->userProvider->loadUserByIdentifier($identifier);
                         if ($user instanceof SamlUserInterface) {
                             $user->setSamlAttributes($attributes);
-                            $deferredEventBadge->setEvent(new UserModifiedEvent($user));
+                            $deferredEventBadge->event = new UserModifiedEvent($user);
                         }
                     } catch (UserNotFoundException $exception) {
                         if (!$this->userFactory instanceof SamlUserFactoryInterface) {
@@ -163,7 +163,7 @@ class SamlAuthenticator implements AuthenticatorInterface, AuthenticationEntryPo
                         }
 
                         $user = $this->userFactory->createUser($identifier, $attributes);
-                        $deferredEventBadge->setEvent(new UserCreatedEvent($user));
+                        $deferredEventBadge->event = new UserCreatedEvent($user);
                     }
                 } catch (\Throwable $exception) {
                     if ($exception instanceof UserNotFoundException) {
@@ -183,7 +183,7 @@ class SamlAuthenticator implements AuthenticatorInterface, AuthenticationEntryPo
         ]);
     }
 
-    protected function extractAttributes(Auth $oneLoginAuth): array
+    private function extractAttributes(Auth $oneLoginAuth): array
     {
         $attributes = ($this->options['use_attribute_friendly_name'] ?? false) !== false
             ? $oneLoginAuth->getAttributesWithFriendlyName()
@@ -193,7 +193,7 @@ class SamlAuthenticator implements AuthenticatorInterface, AuthenticationEntryPo
         return $attributes;
     }
 
-    protected function extractIdentifier(Auth $oneLoginAuth, array $attributes): string
+    private function extractIdentifier(Auth $oneLoginAuth, array $attributes): string
     {
         if (empty($this->options['identifier_attribute'])) {
             return $oneLoginAuth->getNameId();

@@ -16,7 +16,7 @@ use Symfony\Component\HttpKernel\Exception\ServiceUnavailableHttpException;
 use Symfony\Component\Security\Http\SecurityRequestAttributes;
 
 #[AsController]
-readonly class Login
+final readonly class Login
 {
     public function __construct(
         private FirewallMap $firewallMap,

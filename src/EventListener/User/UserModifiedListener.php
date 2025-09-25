@@ -5,4 +5,4 @@ declare(strict_types=1);
 
 namespace Nbgrp\OneloginSamlBundle\EventListener\User;
 
-class UserModifiedListener extends AbstractUserListener {}
+final class UserModifiedListener extends AbstractUserListener {}

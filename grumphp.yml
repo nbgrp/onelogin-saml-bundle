@@ -20,10 +20,6 @@ grumphp:
     phpcsfixer:
       config: '.php-cs-fixer.php'
 
-    phpmd:
-      ruleset: [ 'phpmd-ruleset' ]
-      whitelist_patterns: [ '/^src\/(.*)/' ]
-
     phpmnd:
       directory: 'src'
       exclude_name:

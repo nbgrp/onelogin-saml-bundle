@@ -21,7 +21,7 @@ final class DeferredEventBadgeTest extends TestCase
         $badge = new DeferredEventBadge();
 
         self::assertFalse($badge->isResolved());
-        self::assertNull($badge->getEvent());
+        self::assertNull($badge->event);
         self::assertTrue($badge->isResolved());
     }
 
@@ -32,9 +32,9 @@ final class DeferredEventBadgeTest extends TestCase
         self::assertFalse($badge->isResolved());
 
         $event = self::createStub(Event::class);
-        $badge->setEvent($event);
+        $badge->event = $event;
 
-        self::assertSame($event, $badge->getEvent());
+        self::assertSame($event, $badge->event);
         self::assertTrue($badge->isResolved());
     }
 }

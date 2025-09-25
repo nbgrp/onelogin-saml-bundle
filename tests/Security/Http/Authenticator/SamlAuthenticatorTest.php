@@ -292,7 +292,7 @@ final class SamlAuthenticatorTest extends TestCase
         self::assertInstanceOf(DeferredEventBadge::class, $deferredEventBadge);
 
         /** @var Event $deferredEvent */
-        $deferredEvent = $deferredEventBadge->getEvent();
+        $deferredEvent = $deferredEventBadge->event;
         self::assertInstanceOf(Event::class, $deferredEvent);
 
         $eventDispatcher($this)->dispatch($deferredEvent);

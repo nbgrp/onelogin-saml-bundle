@@ -60,7 +60,7 @@ final class LoginTest extends TestCase
         $session->set('_security.foo.target_path', '/target-path-after-login');
         $request->setSession($session);
 
-        $response = (new Login($firewallMap, ['forceAuthn' => true]))($request, $auth);
+        $response = new Login($firewallMap, ['forceAuthn' => true])($request, $auth);
 
         self::assertSame('/redirect_url', $response->headers->get('Location'));
         self::assertSame('requestID', $session->get(SamlAuthenticator::LAST_REQUEST_ID));
@@ -100,7 +100,7 @@ final class LoginTest extends TestCase
         $session->set('_security.foo.target_path', '/target-path-after-login');
         $request->setSession($session);
 
-        $response = (new Login($firewallMap, []))($request, $auth);
+        $response = new Login($firewallMap, [])($request, $auth);
 
         self::assertSame('/redirect_url', $response->headers->get('Location'));
         self::assertFalse($session->has(SamlAuthenticator::LAST_REQUEST_ID));

@@ -16,14 +16,14 @@ use Symfony\Component\Security\Core\User\UserProviderInterface;
  *
  * @template-implements UserProviderInterface<TUser>
  */
-class SamlUserProvider implements UserProviderInterface
+final readonly class SamlUserProvider implements UserProviderInterface
 {
     /**
      * @param class-string<TUser> $userClass
      */
     public function __construct(
-        protected string $userClass,
-        protected array $defaultRoles,
+        private string $userClass,
+        private array $defaultRoles,
     ) {
         if (!is_a($userClass, UserInterface::class, true)) {
             throw new \InvalidArgumentException('The $userClass argument should be a class implementing the '.UserInterface::class.' interface.');

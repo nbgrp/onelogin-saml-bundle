@@ -16,7 +16,7 @@ use Symfony\Component\Security\Http\Authentication\DefaultAuthenticationSuccessH
  */
 class SamlAuthenticationSuccessHandler extends DefaultAuthenticationSuccessHandler
 {
-    public const RELAY_STATE = 'RelayState';
+    public const string RELAY_STATE = 'RelayState';
 
     #[\Override]
     protected function determineTargetUrl(Request $request): string

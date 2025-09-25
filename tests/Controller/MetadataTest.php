@@ -31,7 +31,7 @@ final class MetadataTest extends TestCase
             ->willReturn($settings)
         ;
 
-        $response = (new Metadata())($auth);
+        $response = new Metadata()($auth);
         self::assertSame('<?xml version="1.0" encoding="utf-8"?><some-xml-data />', $response->getContent());
         self::assertSame('xml', $response->headers->get('Content-Type'));
     }

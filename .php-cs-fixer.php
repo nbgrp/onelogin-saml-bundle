@@ -3,9 +3,9 @@
 
 declare(strict_types=1);
 
-return (new PhpCsFixer\Config())
+return new PhpCsFixer\Config()
     ->setFinder(
-        (new PhpCsFixer\Finder())
+        new PhpCsFixer\Finder()
             ->in(__DIR__)
             ->append([__FILE__])
             ->notPath([

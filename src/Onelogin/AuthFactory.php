@@ -10,7 +10,7 @@ use Symfony\Component\HttpFoundation\RequestStack;
 
 final class AuthFactory
 {
-    public const SCHEME_AND_HOST_PLACEHOLDER = '<request_scheme_and_host>';
+    public const string SCHEME_AND_HOST_PLACEHOLDER = '<request_scheme_and_host>';
 
     public function __construct(
         private readonly RequestStack $requestStack,

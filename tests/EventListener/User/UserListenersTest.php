@@ -36,7 +36,7 @@ final class UserListenersTest extends TestCase
         bool $needPersist,
         UserInterface $user,
     ): void {
-        (new UserCreatedListener($entityManager($this), $needPersist))(new UserCreatedEvent($user));
+        new UserCreatedListener($entityManager($this), $needPersist)(new UserCreatedEvent($user));
     }
 
     /**
@@ -48,7 +48,7 @@ final class UserListenersTest extends TestCase
         bool $needPersist,
         UserInterface $user,
     ): void {
-        (new UserModifiedListener($entityManager($this), $needPersist))(new UserModifiedEvent($user));
+        new UserModifiedListener($entityManager($this), $needPersist)(new UserModifiedEvent($user));
     }
 
     public static function provideUserListenerCases(): iterable

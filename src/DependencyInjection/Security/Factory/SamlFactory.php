@@ -16,9 +16,9 @@ use Symfony\Component\DependencyInjection\ChildDefinition;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\DependencyInjection\Reference;
 
-class SamlFactory extends AbstractFactory
+final class SamlFactory extends AbstractFactory
 {
-    public const PRIORITY = -10;
+    public const int PRIORITY = -10;
 
     public function __construct()
     {
@@ -46,7 +46,7 @@ class SamlFactory extends AbstractFactory
     public function createAuthenticator(ContainerBuilder $container, string $firewallName, array $config, string $userProviderId): string
     {
         $authenticatorId = 'security.authenticator.saml.'.$firewallName;
-        $authenticator = (new ChildDefinition(SamlAuthenticator::class))
+        $authenticator = new ChildDefinition(SamlAuthenticator::class)
             ->replaceArgument(1, new Reference($userProviderId))
             ->replaceArgument(4, new Reference($this->createAuthenticationSuccessHandler($container, $firewallName, $config)))
             ->replaceArgument(5, new Reference($this->createAuthenticationFailureHandler($container, $firewallName, $config)))
@@ -65,7 +65,7 @@ class SamlFactory extends AbstractFactory
         return $authenticatorId;
     }
 
-    protected function createUserListeners(ContainerBuilder $container, string $firewallName, array $config): void
+    private function createUserListeners(ContainerBuilder $container, string $firewallName, array $config): void
     {
         $container->setDefinition('nbgrp_onelogin_saml.user_created_listener.'.$firewallName, new ChildDefinition(UserCreatedListener::class))
             ->replaceArgument(1, $config['persist_user'] ?? false)
