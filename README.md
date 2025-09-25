@@ -136,16 +136,6 @@ nbgrp_onelogin_saml:
     use_proxy_vars: true
     idp_parameter_name: 'custom-idp'
     entity_manager_name: 'custom-em'
-    # Optional parameters for the method \OneLogin\Saml2\Auth::login
-    # See https://github.com/SAML-Toolkits/php-saml?tab=readme-ov-file#initiate-sso
-    authn_request:
-        parameters:
-            Param1: value1
-            Param2: value2
-        forceAuthn: true
-        isPassive: false
-        setNameIdPolicy: true
-        nameIdValueReq: 'extra-id'
 ```
 
 There are few extra parameters for `idp` and `sp` sections. You can read more about them from
