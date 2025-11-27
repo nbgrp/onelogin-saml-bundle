@@ -35,7 +35,6 @@
         "phpunit/phpunit": "^12",
         "symfony/event-dispatcher": "^8"
     },
-    "minimum-stability": "dev",
     "autoload": {
         "psr-4": {
             "Nbgrp\\OneloginSamlBundle\\": "src/"

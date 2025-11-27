@@ -2,7 +2,6 @@
 *.md export-ignore
 grumphp.yml export-ignore
 phpcs.xml export-ignore
-phpmd-ruleset.xml export-ignore
 phpstan.neon export-ignore
 phpunit.xml.dist export-ignore
 psalm.xml export-ignore
