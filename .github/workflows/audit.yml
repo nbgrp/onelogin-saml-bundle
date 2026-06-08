@@ -54,7 +54,7 @@ jobs:
         run: vendor/bin/phpunit
 
       - name: Codecov
-        uses: codecov/codecov-action@v5
+        uses: codecov/codecov-action@v7
         with:
           token: ${{ secrets.CODECOV_TOKEN }}
           files: ./clover.xml
